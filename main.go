@@ -11,7 +11,6 @@ import (
 )
 
 type appContext struct {
-	DA          dal.DataHandler
 	Controllers controllers.List
 }
 
