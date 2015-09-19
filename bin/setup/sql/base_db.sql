@@ -18,9 +18,15 @@ CREATE TABLE invitees (
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NOT NULL,
 	email varchar(255) NOT NULL,
-	date_attending boolean DEFAULT false,
-	date_first_name varchar(255),
-	date_last_name varchar(255),
+	attending boolean DEFAULT false,
 	created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp
+);
+
+CREATE TABLE dates (
+	date_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
+	fk_invitee_id uuid REFERENCES invitees (invitee_id),
+	first_name varchar(255) NOT NULL,
+	last_name varchar(255) NOT NULL,
+	attending boolean DEFAULT false
 );
