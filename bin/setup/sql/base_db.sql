@@ -18,7 +18,7 @@ CREATE TABLE invitees (
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NOT NULL,
 	email varchar(255) NOT NULL,
-	date_attending boolean,
+	date_attending boolean DEFAULT false,
 	date_first_name varchar(255),
 	date_last_name varchar(255),
 	created_at timestamp default current_timestamp,
