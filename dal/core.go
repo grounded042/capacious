@@ -44,3 +44,39 @@ func (dh DataHandler) CreateEvent(createMe *entities.Event) error {
 
 	return db.Error
 }
+
+func (dh DataHandler) GetAllInviteesForEvent(eventId string) ([]entities.Invitee, error) {
+	var invitees = []entities.Invitee{}
+
+	db := dh.conn.Where("fk_event_id = ?", eventId).Find(&invitees)
+
+	if db.Error != nil {
+		return []entities.Invitee{}, db.Error
+	}
+
+	return dh.addDatesToInvitees(invitees)
+}
+
+func (dh DataHandler) addDatesToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
+	for key, value := range list {
+		date, err := dh.GetDateForInviteeId(value.InviteeId)
+
+		if err != nil {
+			return []entities.Invitee{}, err
+		}
+
+		list[key].Date = date
+	}
+
+	return list, nil
+}
+
+func (dh DataHandler) GetDateForInviteeId(id string) (entities.Date, error) {
+	var date = entities.Date{FkInviteeId: id}
+
+	db := dh.conn.Find(&date)
+
+	fmt.Println(date)
+
+	return date, db.Error
+}

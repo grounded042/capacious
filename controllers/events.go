@@ -12,18 +12,18 @@ import (
 )
 
 type EventsController struct {
-	evSvc services.EventsService
+	sl services.List
 }
 
-func NewEventsController(newEvSvc services.EventsService) EventsController {
+func NewEventsController(newSL services.List) EventsController {
 	return EventsController{
-		evSvc: newEvSvc,
+		sl: newSL,
 	}
 }
 
 func (ec EventsController) GetEvents(c web.C, w http.ResponseWriter, r *http.Request) {
 
-	if events, err := ec.evSvc.GetEvents(); err != nil {
+	if events, err := ec.sl.Events.GetEvents(); err != nil {
 		w.WriteHeader(500)
 		fmt.Println(err)
 	} else {
@@ -49,7 +49,7 @@ func (ec EventsController) CreateEvent(c web.C, w http.ResponseWriter, r *http.R
 		return
 	}
 
-	if err := ec.evSvc.CreateEvent(&event); err != nil {
+	if err := ec.sl.Events.CreateEvent(&event); err != nil {
 		w.WriteHeader(500)
 		fmt.Println(err)
 	} else {
