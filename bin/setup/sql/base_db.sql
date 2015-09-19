@@ -28,5 +28,7 @@ CREATE TABLE dates (
 	fk_invitee_id uuid REFERENCES invitees (invitee_id),
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NOT NULL,
-	attending boolean DEFAULT false
+	attending boolean DEFAULT false,
+	created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp
 );
