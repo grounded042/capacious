@@ -20,4 +20,9 @@ BEGIN
     	'shale@mann.co'
 	);
 
+    INSERT INTO dates(fk_invitee_id, first_name, last_name)
+    VALUES (
+        '24669e54-5ee2-11e5-a379-7b2796b289b2', 'Helen', ''
+    );
+
 END $$
