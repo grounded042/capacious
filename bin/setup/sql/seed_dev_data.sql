@@ -7,8 +7,6 @@ DECLARE
     uid uuid;
 BEGIN
 
-    SELECT uuid_generate_v1mc() INTO uid;
-
     INSERT INTO events(event_id, name, description, start_time, 
         end_time, created_at, updated_at)
     VALUES (
