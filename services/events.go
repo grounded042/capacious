@@ -11,6 +11,9 @@ type EventsGateway interface {
 	// we will want to lockdown which events you can
 	// get bases on your user id
 	GetAllEvents() ([]entities.Event, error)
+	// CreateEvent creates an event from a supplied
+	// event object
+	CreateEvent(*entities.Event) error
 }
 
 type EventsService struct {
@@ -31,4 +34,14 @@ func (es EventsService) GetEvents() ([]entities.Event, utils.Error) {
 	}
 
 	return events, nil
+}
+
+func (es EventsService) CreateEvent(event *entities.Event) utils.Error {
+	err := es.da.CreateEvent(event)
+
+	if err != nil {
+		return utils.NewApiError(500, err.Error())
+	}
+
+	return nil
 }

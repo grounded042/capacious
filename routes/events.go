@@ -9,5 +9,10 @@ func EventRoutes(cl controllers.List) []Route {
 			Pattern: "/events",
 			Handler: cl.Events.GetEvents,
 		},
+		Route{
+			Method:  "post",
+			Pattern: "/events",
+			Handler: cl.Events.CreateEvent,
+		},
 	}
 }

@@ -38,3 +38,9 @@ func (dh DataHandler) GetAllEvents() ([]entities.Event, error) {
 
 	return events, db.Error
 }
+
+func (dh DataHandler) CreateEvent(createMe *entities.Event) error {
+	db := dh.conn.Create(&createMe)
+
+	return db.Error
+}
