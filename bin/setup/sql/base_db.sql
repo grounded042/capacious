@@ -17,14 +17,14 @@ CREATE TABLE invitees (
 	fk_event_id uuid REFERENCES events (event_id),
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NOT NULL,
-	email varchar(255) NOT NULL,
+	email varchar(255) NOT NULL UNIQUE,
 	attending boolean DEFAULT false,
 	created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp
 );
 
-CREATE TABLE dates (
-	date_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
+CREATE TABLE guests (
+	guest_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
 	fk_invitee_id uuid REFERENCES invitees (invitee_id),
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NOT NULL,
