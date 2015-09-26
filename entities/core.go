@@ -18,13 +18,13 @@ type Invitee struct {
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
 	Email     string    `json:"email"`
-	Date      Date      `json:"date"`
+	Guests    []Guest   `json:"guests"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type Date struct {
-	DateId      string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"date_id"`
+type Guest struct {
+	GuestId     string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"date_id"`
 	FkInviteeId string    `json:"-"`
 	FirstName   string    `json:"first_name"`
 	LastName    string    `json:"last_name"`
