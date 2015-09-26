@@ -8,6 +8,7 @@ CREATE TABLE events (
     description varchar(255) NOT NULL,
     start_time timestamp,
     end_time timestamp,
+    allowed_guests int,
     created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp
 );
