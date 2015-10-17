@@ -61,3 +61,15 @@ func (ec InviteesController) CreateInviteeForEvent(c web.C, w http.ResponseWrite
 		json.NewEncoder(w).Encode(invitee)
 	}
 }
+
+func (ic InviteesController) GetInvitee(c web.C, w http.ResponseWriter, r *http.Request) {
+	invitee, err := ic.sl.Invitees.GetInviteeFromId(c.URLParams["id"])
+
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(invitee)
+	}
+}

@@ -99,3 +99,11 @@ func (dh DataHandler) CreateInvitee(createMe *entities.Invitee) error {
 
 	return db.Error
 }
+
+func (dh DataHandler) GetInviteeFromId(id string) (entities.Invitee, error) {
+	var invitee entities.Invitee
+
+	db := dh.conn.Debug().Where("invitee_id = ?", id).First(&invitee)
+
+	return invitee, db.Error
+}

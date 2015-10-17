@@ -23,6 +23,7 @@ func main() {
 	ac := getAppContext()
 
 	routes.BuildRoutes(capaciousAPIServer, routes.EventRoutes(ac.Controllers), *prefix)
+	routes.BuildRoutes(capaciousAPIServer, routes.InviteeRoutes(ac.Controllers), *prefix)
 
 	goji.Serve()
 }

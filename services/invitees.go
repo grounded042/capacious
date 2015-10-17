@@ -13,6 +13,9 @@ type InviteeGateway interface {
 	// CreateInvitee creates an invitee from a supplied
 	// invitee object
 	CreateInvitee(*entities.Invitee) error
+	// GetInviteeFromId fetches an invitee from the database
+	// based on the supplied id
+	GetInviteeFromId(string) (entities.Invitee, error)
 }
 
 type InviteeService struct {
@@ -45,4 +48,14 @@ func (is InviteeService) CreateInviteeForEvent(invitee *entities.Invitee, event 
 	}
 
 	return nil
+}
+
+func (is InviteeService) GetInviteeFromId(id string) (entities.Invitee, utils.Error) {
+	invitee, err := is.da.GetInviteeFromId(id)
+
+	if err != nil {
+		return entities.Invitee{}, utils.NewApiError(500, err.Error())
+	}
+
+	return invitee, nil
 }
