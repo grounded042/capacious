@@ -10,9 +10,13 @@ type InviteeGateway interface {
 	// the db for a specified event.
 	// TODO: this will need to pagination at some point
 	GetAllInviteesForEvent(string) ([]entities.Invitee, error)
+	// CreateInvitee creates an invitee from a supplied
+	// invitee object
+	CreateInvitee(*entities.Invitee) error
 }
 
 type InviteeService struct {
+	c  List
 	da InviteeGateway
 }
 
@@ -30,4 +34,16 @@ func (is InviteeService) GetInviteesForEvent(eventId string) ([]entities.Invitee
 	}
 
 	return invitees, nil
+}
+
+func (is InviteeService) CreateInviteeForEvent(invitee *entities.Invitee, event entities.Event) utils.Error {
+	invitee.FkEventId = event.EventId
+
+	err := is.da.CreateInvitee(invitee)
+
+	if err != nil {
+		return utils.NewApiError(500, err.Error())
+	}
+
+	return nil
 }

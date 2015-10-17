@@ -54,29 +54,48 @@ func (dh DataHandler) GetAllInviteesForEvent(eventId string) ([]entities.Invitee
 		return []entities.Invitee{}, db.Error
 	}
 
-	return dh.addDatesToInvitees(invitees)
+	return dh.addGuestsToInvitees(invitees)
 }
 
-func (dh DataHandler) addDatesToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
+func (dh DataHandler) addGuestsToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
 	for key, value := range list {
-		date, err := dh.GetDateForInviteeId(value.InviteeId)
+		guests, err := dh.GetGuestsFromInviteeId(value.InviteeId)
 
 		if err != nil {
 			return []entities.Invitee{}, err
 		}
 
-		list[key].Date = date
+		list[key].Guests = guests
 	}
 
 	return list, nil
 }
 
-func (dh DataHandler) GetDateForInviteeId(id string) (entities.Date, error) {
-	var date = entities.Date{FkInviteeId: id}
+func (dh DataHandler) GetGuestsFromInviteeId(id string) ([]entities.Guest, error) {
+	var guests []entities.Guest
 
-	db := dh.conn.Find(&date)
+	db := dh.conn.Debug().Table("guests").Where("fk_invitee_id = ?", id).Find(&guests)
 
-	fmt.Println(date)
+	return guests, db.Error
+}
 
-	return date, db.Error
+func (dh DataHandler) CreateInvitee(createMe *entities.Invitee) error {
+
+	// TODO: check and make sure email doesn't exist yet
+	db := dh.conn.Debug().Create(&createMe)
+
+	if db.Error != nil {
+		return db.Error
+	}
+
+	for _, value := range createMe.Guests {
+		value.FkInviteeId = createMe.InviteeId
+		db.Create(&value)
+
+		if db.Error != nil {
+			return db.Error
+		}
+	}
+
+	return db.Error
 }

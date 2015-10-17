@@ -19,5 +19,10 @@ func EventRoutes(cl controllers.List) []Route {
 			Pattern: "/events/:id/relationships/invitees",
 			Handler: cl.Invitees.GetInviteesForEvent,
 		},
+		Route{
+			Method:  "post",
+			Pattern: "/events/:id/relationships/invitees",
+			Handler: cl.Invitees.CreateInviteeForEvent,
+		},
 	}
 }
