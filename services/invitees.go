@@ -16,7 +16,6 @@ type InviteeGateway interface {
 }
 
 type InviteeService struct {
-	c  List
 	da InviteeGateway
 }
 
