@@ -9,5 +9,10 @@ func InviteeRoutes(cl controllers.List) []Route {
 			Pattern: "/invitees/:id",
 			Handler: cl.Invitees.GetInvitee,
 		},
+		Route{
+			Method:  "patch",
+			Pattern: "/invitees/:id",
+			Handler: cl.Invitees.EditInvitee,
+		},
 	}
 }

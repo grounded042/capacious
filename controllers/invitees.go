@@ -73,3 +73,31 @@ func (ic InviteesController) GetInvitee(c web.C, w http.ResponseWriter, r *http.
 		json.NewEncoder(w).Encode(invitee)
 	}
 }
+
+func (ic InviteesController) EditInvitee(c web.C, w http.ResponseWriter, r *http.Request) {
+	invitee := entities.Invitee{InviteeId: c.URLParams["id"]}
+
+	rBody, ioErr := ioutil.ReadAll(r.Body)
+
+	if ioErr != nil {
+		w.WriteHeader(500)
+		fmt.Println(ioErr)
+		return
+	}
+
+	if err := json.Unmarshal(rBody, &invitee); err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+		return
+	}
+
+	err := ic.sl.Invitees.EditInvitee(invitee)
+
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(invitee)
+	}
+}

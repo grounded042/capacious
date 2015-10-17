@@ -16,6 +16,9 @@ type InviteeGateway interface {
 	// GetInviteeFromId fetches an invitee from the database
 	// based on the supplied id
 	GetInviteeFromId(string) (entities.Invitee, error)
+	// UpdateInvitee updates an invitee in the database
+	// with info from the passed in object
+	UpdateInvitee(entities.Invitee) error
 }
 
 type InviteeService struct {
@@ -58,4 +61,15 @@ func (is InviteeService) GetInviteeFromId(id string) (entities.Invitee, utils.Er
 	}
 
 	return invitee, nil
+}
+
+func (is InviteeService) EditInvitee(updateMe entities.Invitee) utils.Error {
+	// TODO: make sure to constrain the number of guests here
+	err := is.da.UpdateInvitee(updateMe)
+
+	if err != nil {
+		return utils.NewApiError(500, err.Error())
+	}
+
+	return nil
 }

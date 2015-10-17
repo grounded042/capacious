@@ -107,3 +107,18 @@ func (dh DataHandler) GetInviteeFromId(id string) (entities.Invitee, error) {
 
 	return invitee, db.Error
 }
+
+func (dh DataHandler) UpdateInvitee(updateMe entities.Invitee) error {
+	// TODO: update all guests too
+	invitee, err := dh.GetInviteeFromId(updateMe.InviteeId)
+
+	if err != nil {
+		return err
+	}
+
+	updateMe.FkEventId = invitee.FkEventId
+
+	db := dh.conn.Debug().Save(updateMe)
+
+	return db.Error
+}
