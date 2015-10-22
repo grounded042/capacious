@@ -7,9 +7,9 @@ type List struct {
 	Invitees InviteesController
 }
 
-func NewControllersList(newSvcsList services.List) List {
+func NewControllersList(coord services.Coordinator) List {
 	return List{
-		Events:   NewEventsController(newSvcsList),
-		Invitees: NewInviteesController(newSvcsList),
+		Events:   NewEventsController(coord),
+		Invitees: NewInviteesController(coord),
 	}
 }

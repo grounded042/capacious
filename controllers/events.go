@@ -7,23 +7,27 @@ import (
 	"net/http"
 
 	"github.com/grounded042/capacious/entities"
-	"github.com/grounded042/capacious/services"
 	"github.com/zenazn/goji/web"
 )
 
-type EventsController struct {
-	sl services.List
+type EventsStub interface {
+	GetEvents() ([]entities.Event, error)
+	CreateEvent(*entities.Event) error
 }
 
-func NewEventsController(newSL services.List) EventsController {
+type EventsController struct {
+	es EventsStub
+}
+
+func NewEventsController(newEs EventsStub) EventsController {
 	return EventsController{
-		sl: newSL,
+		es: newEs,
 	}
 }
 
 func (ec EventsController) GetEvents(c web.C, w http.ResponseWriter, r *http.Request) {
 
-	if events, err := ec.sl.Events.GetEvents(); err != nil {
+	if events, err := ec.es.GetEvents(); err != nil {
 		w.WriteHeader(500)
 		fmt.Println(err)
 	} else {
@@ -49,7 +53,7 @@ func (ec EventsController) CreateEvent(c web.C, w http.ResponseWriter, r *http.R
 		return
 	}
 
-	if err := ec.sl.Events.CreateEvent(&event); err != nil {
+	if err := ec.es.CreateEvent(&event); err != nil {
 		w.WriteHeader(500)
 		fmt.Println(err)
 	} else {

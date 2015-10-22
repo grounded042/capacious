@@ -30,8 +30,8 @@ func main() {
 
 func getAppContext() appContext {
 	da := dal.NewDal()
-	sl := services.NewServicesList(da)
-	cl := controllers.NewControllersList(sl)
+	co := services.NewCoordinator(da)
+	cl := controllers.NewControllersList(co)
 
 	return appContext{
 		Controllers: cl,

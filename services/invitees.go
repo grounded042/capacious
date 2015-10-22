@@ -5,7 +5,7 @@ import (
 	"github.com/grounded042/capacious/utils"
 )
 
-type InviteeGateway interface {
+type inviteeGateway interface {
 	// GetAllInvitees gets all of the invitees in
 	// the db for a specified event.
 	// TODO: this will need to pagination at some point
@@ -21,17 +21,18 @@ type InviteeGateway interface {
 	UpdateInvitee(entities.Invitee) error
 }
 
-type InviteeService struct {
-	da InviteeGateway
+// the invitee is a subset of the event object -
+type inviteeService struct {
+	da inviteeGateway
 }
 
-func NewInviteeService(newDa InviteeGateway) InviteeService {
-	return InviteeService{
+func newInviteeService(newDa inviteeGateway) inviteeService {
+	return inviteeService{
 		da: newDa,
 	}
 }
 
-func (is InviteeService) GetInviteesForEvent(eventId string) ([]entities.Invitee, utils.Error) {
+func (is inviteeService) GetInviteesForEvent(eventId string) ([]entities.Invitee, utils.Error) {
 	invitees, err := is.da.GetAllInviteesForEvent(eventId)
 
 	if err != nil {
@@ -41,7 +42,7 @@ func (is InviteeService) GetInviteesForEvent(eventId string) ([]entities.Invitee
 	return invitees, nil
 }
 
-func (is InviteeService) CreateInviteeForEvent(invitee *entities.Invitee, event entities.Event) utils.Error {
+func (is inviteeService) CreateInviteeForEvent(invitee *entities.Invitee, event entities.Event) utils.Error {
 	invitee.FkEventId = event.EventId
 
 	err := is.da.CreateInvitee(invitee)
@@ -53,7 +54,7 @@ func (is InviteeService) CreateInviteeForEvent(invitee *entities.Invitee, event 
 	return nil
 }
 
-func (is InviteeService) GetInviteeFromId(id string) (entities.Invitee, utils.Error) {
+func (is inviteeService) GetInviteeFromId(id string) (entities.Invitee, utils.Error) {
 	invitee, err := is.da.GetInviteeFromId(id)
 
 	if err != nil {
@@ -63,7 +64,7 @@ func (is InviteeService) GetInviteeFromId(id string) (entities.Invitee, utils.Er
 	return invitee, nil
 }
 
-func (is InviteeService) EditInvitee(updateMe entities.Invitee) utils.Error {
+func (is inviteeService) EditInvitee(updateMe entities.Invitee) utils.Error {
 	// TODO: make sure to constrain the number of guests here
 	err := is.da.UpdateInvitee(updateMe)
 

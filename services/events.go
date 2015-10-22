@@ -5,7 +5,7 @@ import (
 	"github.com/grounded042/capacious/utils"
 )
 
-type EventsGateway interface {
+type eventsGateway interface {
 	// GetAllEvents gets all of the events in the db
 	// TODO: This will need to change eventually since
 	// we will want to lockdown which events you can
@@ -16,17 +16,17 @@ type EventsGateway interface {
 	CreateEvent(*entities.Event) error
 }
 
-type EventsService struct {
-	da EventsGateway
+type eventsService struct {
+	da eventsGateway
 }
 
-func NewEventsService(newDa EventsGateway) EventsService {
-	return EventsService{
+func newEventsService(newDa eventsGateway) eventsService {
+	return eventsService{
 		da: newDa,
 	}
 }
 
-func (es EventsService) GetEvents() ([]entities.Event, utils.Error) {
+func (es eventsService) GetEvents() ([]entities.Event, utils.Error) {
 	events, err := es.da.GetAllEvents()
 
 	if err != nil {
@@ -36,7 +36,7 @@ func (es EventsService) GetEvents() ([]entities.Event, utils.Error) {
 	return events, nil
 }
 
-func (es EventsService) CreateEvent(event *entities.Event) utils.Error {
+func (es eventsService) CreateEvent(event *entities.Event) utils.Error {
 	err := es.da.CreateEvent(event)
 
 	if err != nil {

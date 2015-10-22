@@ -7,22 +7,28 @@ import (
 	"net/http"
 
 	"github.com/grounded042/capacious/entities"
-	"github.com/grounded042/capacious/services"
 	"github.com/zenazn/goji/web"
 )
 
-type InviteesController struct {
-	sl services.List
+type InviteeStub interface {
+	GetInviteesForEvent(string) ([]entities.Invitee, error)
+	CreateInviteeForEvent(*entities.Invitee, entities.Event) error
+	GetInviteeFromId(string) (entities.Invitee, error)
+	EditInvitee(entities.Invitee) error
 }
 
-func NewInviteesController(newSL services.List) InviteesController {
+type InviteesController struct {
+	is InviteeStub
+}
+
+func NewInviteesController(newIs InviteeStub) InviteesController {
 	return InviteesController{
-		sl: newSL,
+		is: newIs,
 	}
 }
 
 func (ec InviteesController) GetInviteesForEvent(c web.C, w http.ResponseWriter, r *http.Request) {
-	invitees, err := ec.sl.Invitees.GetInviteesForEvent(c.URLParams["id"])
+	invitees, err := ec.is.GetInviteesForEvent(c.URLParams["id"])
 
 	if err != nil {
 		w.WriteHeader(500)
@@ -53,7 +59,7 @@ func (ec InviteesController) CreateInviteeForEvent(c web.C, w http.ResponseWrite
 		return
 	}
 
-	if err := ec.sl.Invitees.CreateInviteeForEvent(&invitee, event); err != nil {
+	if err := ec.is.CreateInviteeForEvent(&invitee, event); err != nil {
 		w.WriteHeader(500)
 		fmt.Println(err)
 	} else {
@@ -63,7 +69,7 @@ func (ec InviteesController) CreateInviteeForEvent(c web.C, w http.ResponseWrite
 }
 
 func (ic InviteesController) GetInvitee(c web.C, w http.ResponseWriter, r *http.Request) {
-	invitee, err := ic.sl.Invitees.GetInviteeFromId(c.URLParams["id"])
+	invitee, err := ic.is.GetInviteeFromId(c.URLParams["id"])
 
 	if err != nil {
 		w.WriteHeader(500)
@@ -91,7 +97,7 @@ func (ic InviteesController) EditInvitee(c web.C, w http.ResponseWriter, r *http
 		return
 	}
 
-	err := ic.sl.Invitees.EditInvitee(invitee)
+	err := ic.is.EditInvitee(invitee)
 
 	if err != nil {
 		w.WriteHeader(500)
