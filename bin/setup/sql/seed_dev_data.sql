@@ -14,15 +14,26 @@ BEGIN
         '2015-12-15 22:00:00.000000', '2015-07-11 22:36:31.024391', '2015-07-11 22:36:31.024391'
     );
 
-    INSERT INTO invitees(invitee_id, fk_event_id, first_name, last_name, email)
+    INSERT INTO guests(guest_id, first_name, last_name, attending)
     VALUES (
-    	'24669e54-5ee2-11e5-a379-7b2796b289b2', 'cd7bc650-2e71-11e5-a390-675459d99309', 'Saxton', 'Hale', 
-    	'shale@mann.co'
+    	'24669e54-5ee2-11e5-a379-7b2796b289b2', 'Saxton', 'Hale', FALSE
 	);
 
-    INSERT INTO guests(fk_invitee_id, first_name, last_name)
+    INSERT INTO guests(guest_id, first_name, last_name, attending)
     VALUES (
-        '24669e54-5ee2-11e5-a379-7b2796b289b2', 'Helen', ''
+        '81e6d338-7917-11e5-8b8e-a37beb0fdab8', 'Helen', '', FALSE
+    );
+
+
+    INSERT INTO invitees(invitee_id, fk_event_id, fk_guest_id, email)
+    VALUES (
+        'fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068', 'cd7bc650-2e71-11e5-a390-675459d99309',
+        '24669e54-5ee2-11e5-a379-7b2796b289b2', 'shale@mann.co'
+    );
+
+    INSERT INTO invitee_guests(fk_invitee_id, fk_guest_id)
+    VALUES (
+        'fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068', '81e6d338-7917-11e5-8b8e-a37beb0fdab8'
     );
 
 END $$

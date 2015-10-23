@@ -13,23 +13,30 @@ CREATE TABLE events (
     updated_at timestamp default current_timestamp
 );
 
-CREATE TABLE invitees (
-	invitee_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
-	fk_event_id uuid REFERENCES events (event_id),
+CREATE TABLE guests (
+	guest_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
 	first_name varchar(255) NOT NULL,
 	last_name varchar(255) NOT NULL,
-	email varchar(255) NOT NULL UNIQUE,
 	attending boolean DEFAULT false,
 	created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp
 );
 
-CREATE TABLE guests (
-	guest_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
-	fk_invitee_id uuid REFERENCES invitees (invitee_id),
-	first_name varchar(255) NOT NULL,
-	last_name varchar(255) NOT NULL,
-	attending boolean DEFAULT false,
+CREATE TABLE invitees (
+	invitee_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
+	fk_event_id uuid REFERENCES events (event_id),
+	fk_guest_id uuid REFERENCES guests (guest_id),
+	email varchar(255) NOT NULL UNIQUE,
 	created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp
 );
+
+CREATE TABLE invitee_guests (
+	invitee_guest_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
+	fk_invitee_id uuid REFERENCES invitees (invitee_id),
+	fk_guest_id uuid REFERENCES guests (guest_id),
+	created_at timestamp default current_timestamp,
+    updated_at timestamp default current_timestamp
+);
+
+
