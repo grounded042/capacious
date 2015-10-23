@@ -54,34 +54,61 @@ func (dh DataHandler) GetAllInviteesForEvent(eventId string) ([]entities.Invitee
 		return []entities.Invitee{}, db.Error
 	}
 
-	return dh.addGuestsToInvitees(invitees)
+	// TODO: add self to each invitee object
+
+	return dh.addInviteeGuestsToInvitees(invitees)
 }
 
-func (dh DataHandler) addGuestsToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
+func (dh DataHandler) addInviteeGuestsToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
 	for key, value := range list {
-		guests, err := dh.GetGuestsFromInviteeId(value.InviteeId)
+		inviteeGuests, err := dh.GetInviteeGuestsFromInviteeId(value.InviteeId)
 
 		if err != nil {
 			return []entities.Invitee{}, err
 		}
 
-		list[key].Guests = guests
+		list[key].Guests = inviteeGuests
 	}
 
 	return list, nil
 }
 
-func (dh DataHandler) GetGuestsFromInviteeId(id string) ([]entities.Guest, error) {
-	var guests []entities.Guest
+func (dh DataHandler) addInviteeGuestsToInvitee(invitee entities.Invitee) (entities.Invitee, error) {
+	inviteeGuests, err := dh.GetInviteeGuestsFromInviteeId(invitee.InviteeId)
 
-	db := dh.conn.Debug().Table("guests").Where("fk_invitee_id = ?", id).Find(&guests)
+	if err != nil {
+		return entities.Invitee{}, err
+	}
 
-	return guests, db.Error
+	invitee.Guests = inviteeGuests
+
+	return invitee, nil
+}
+
+func (dh DataHandler) GetInviteeGuestsFromInviteeId(id string) ([]entities.InviteeGuest, error) {
+	var inviteeGuests []entities.InviteeGuest
+
+	db := dh.conn.Debug().Table("invitee_guests").Where("fk_invitee_id = ?", id).Find(&inviteeGuests)
+
+	if db.Error != nil {
+		return []entities.InviteeGuest{}, db.Error
+	}
+
+	for key, value := range inviteeGuests {
+		inviteeGuests[key].Self, db.Error = dh.getGuestFromId(value.FkGuestId)
+
+		if db.Error != nil {
+			return []entities.InviteeGuest{}, db.Error
+		}
+	}
+
+	return inviteeGuests, nil
 }
 
 func (dh DataHandler) CreateInvitee(createMe *entities.Invitee) error {
 
 	// TODO: check and make sure email doesn't exist yet
+	// TODO: create invitee and then the self of the invitee
 	db := dh.conn.Debug().Create(&createMe)
 
 	if db.Error != nil {
@@ -89,6 +116,7 @@ func (dh DataHandler) CreateInvitee(createMe *entities.Invitee) error {
 	}
 
 	for _, value := range createMe.Guests {
+		// TODO: use a method to create the inviteeguest and their self entry
 		value.FkInviteeId = createMe.InviteeId
 		db.Create(&value)
 
@@ -105,7 +133,25 @@ func (dh DataHandler) GetInviteeFromId(id string) (entities.Invitee, error) {
 
 	db := dh.conn.Debug().Where("invitee_id = ?", id).First(&invitee)
 
-	return invitee, db.Error
+	if db.Error != nil {
+		return entities.Invitee{}, db.Error
+	}
+
+	invitee.Self, db.Error = dh.getGuestFromId(invitee.FkGuestId)
+
+	if db.Error != nil {
+		return entities.Invitee{}, db.Error
+	}
+
+	return dh.addInviteeGuestsToInvitee(invitee)
+}
+
+func (dh DataHandler) getGuestFromId(id string) (entities.Guest, error) {
+	var guest entities.Guest
+
+	db := dh.conn.Debug().Where("guest_id = ?", id).First(&guest)
+
+	return guest, db.Error
 }
 
 func (dh DataHandler) UpdateInvitee(updateMe entities.Invitee) error {
