@@ -19,6 +19,12 @@ type inviteeGateway interface {
 	// UpdateInvitee updates an invitee in the database
 	// with info from the passed in object
 	UpdateInvitee(entities.Invitee) error
+	// CreateInviteeGuest create and invitee guest from
+	// a supplied invitee guest object
+	CreateInviteeGuest(*entities.InviteeGuest) error
+	// UpdateInviteeGuest update an invitee guest in the
+	// database with info from the passed in object
+	UpdateInviteeGuest(entities.InviteeGuest) error
 }
 
 // the invitee is a subset of the event object -
@@ -65,8 +71,27 @@ func (is inviteeService) GetInviteeFromId(id string) (entities.Invitee, utils.Er
 }
 
 func (is inviteeService) EditInvitee(updateMe entities.Invitee) utils.Error {
-	// TODO: make sure to constrain the number of guests here
 	err := is.da.UpdateInvitee(updateMe)
+
+	if err != nil {
+		return utils.NewApiError(500, err.Error())
+	}
+
+	return nil
+}
+
+func (is inviteeService) CreateInviteeGuest(iGuest *entities.InviteeGuest) utils.Error {
+	err := is.da.CreateInviteeGuest(iGuest)
+
+	if err != nil {
+		return utils.NewApiError(500, err.Error())
+	}
+
+	return nil
+}
+
+func (is inviteeService) EditInviteeGuest(updateMe entities.InviteeGuest) utils.Error {
+	err := is.da.UpdateInviteeGuest(updateMe)
 
 	if err != nil {
 		return utils.NewApiError(500, err.Error())

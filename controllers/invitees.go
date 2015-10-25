@@ -15,6 +15,8 @@ type InviteeStub interface {
 	CreateInviteeForEvent(*entities.Invitee, entities.Event) error
 	GetInviteeFromId(string) (entities.Invitee, error)
 	EditInvitee(entities.Invitee) error
+	EditInviteeGuest(entities.InviteeGuest) error
+	CreateInviteeGuest(*entities.InviteeGuest) error
 }
 
 type InviteesController struct {
@@ -105,5 +107,60 @@ func (ic InviteesController) EditInvitee(c web.C, w http.ResponseWriter, r *http
 	} else {
 		w.WriteHeader(200)
 		json.NewEncoder(w).Encode(invitee)
+	}
+}
+
+func (ic InviteesController) EditInviteeGuest(c web.C, w http.ResponseWriter, r *http.Request) {
+	iGuest := entities.InviteeGuest{InviteeGuestId: c.URLParams["guest_id"], FkInviteeId: c.URLParams["invitee_id"]}
+
+	rBody, ioErr := ioutil.ReadAll(r.Body)
+
+	if ioErr != nil {
+		w.WriteHeader(500)
+		fmt.Println(ioErr)
+		return
+	}
+
+	if err := json.Unmarshal(rBody, &iGuest); err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+		return
+	}
+
+	err := ic.is.EditInviteeGuest(iGuest)
+
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(iGuest)
+	}
+
+}
+
+func (ec InviteesController) CreateInviteeGuest(c web.C, w http.ResponseWriter, r *http.Request) {
+	iGuest := entities.InviteeGuest{FkInviteeId: c.URLParams["invitee_id"]}
+
+	rBody, ioErr := ioutil.ReadAll(r.Body)
+
+	if ioErr != nil {
+		w.WriteHeader(500)
+		fmt.Println(ioErr)
+		return
+	}
+
+	if err := json.Unmarshal(rBody, &iGuest); err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+		return
+	}
+
+	if err := ec.is.CreateInviteeGuest(&iGuest); err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(iGuest)
 	}
 }

@@ -158,7 +158,7 @@ func (dh DataHandler) CreateInvitee(createMe *entities.Invitee) error {
 	for key, value := range createMe.Guests {
 		value.FkInviteeId = createMe.InviteeId
 
-		cigErr := dh.createInviteeGuest(&value)
+		cigErr := dh.CreateInviteeGuest(&value)
 
 		if cigErr != nil {
 			return cigErr
@@ -177,7 +177,7 @@ func (dh DataHandler) createGuest(createMe *entities.Guest) error {
 	return db.Error
 }
 
-func (dh DataHandler) createInviteeGuest(createMe *entities.InviteeGuest) error {
+func (dh DataHandler) CreateInviteeGuest(createMe *entities.InviteeGuest) error {
 	// create the invitee guest self
 	cErr := dh.createGuest(&createMe.Self)
 
@@ -229,7 +229,50 @@ func (dh DataHandler) UpdateInvitee(updateMe entities.Invitee) error {
 
 	updateMe.FkEventId = invitee.FkEventId
 
+func (dh DataHandler) updateGuest(updateMe entities.Guest) error {
+	return dh.conn.Debug().Save(updateMe).Error
+}
+
+func (dh DataHandler) UpdateInviteeGuest(updateMe entities.InviteeGuest) error {
+	curIG, err := dh.GetInviteeGuestFromId(updateMe.InviteeGuestId)
+
+	if err != nil {
+		return err
+	}
+
+	// update with info from db
+	updateMe.FkGuestId = curIG.FkGuestId
+	updateMe.FkInviteeId = curIG.FkInviteeId
+
+	// check and make sure the self id is not different
+	if updateMe.FkGuestId != updateMe.Self.GuestId {
+		return errors.New("bad invitee guest self id")
+	}
+
+	// update the invitee guest self
+	err = dh.updateGuest(updateMe.Self)
+
+	if err != nil {
+		return err
+	}
+
+	// lastly, update the invitee obj
 	db := dh.conn.Debug().Save(updateMe)
 
 	return db.Error
+
+}
+
+func (dh DataHandler) GetInviteeGuestFromId(id string) (entities.InviteeGuest, error) {
+	var iGuest entities.InviteeGuest
+
+	db := dh.conn.Debug().Where("invitee_guest_id = ?", id).First(&iGuest)
+
+	if db.Error != nil {
+		return entities.InviteeGuest{}, db.Error
+	}
+
+	iGuest.Self, db.Error = dh.getGuestFromId(iGuest.FkGuestId)
+
+	return iGuest, db.Error
 }
