@@ -138,22 +138,57 @@ func (dh DataHandler) GetInviteeGuestsFromInviteeId(id string) ([]entities.Invit
 func (dh DataHandler) CreateInvitee(createMe *entities.Invitee) error {
 
 	// TODO: check and make sure email doesn't exist yet
-	// TODO: create invitee and then the self of the invitee
+
+	// create the invitee self
+	cErr := dh.createGuest(&createMe.Self)
+
+	if cErr != nil {
+		return cErr
+	}
+
+	// assign the id of self to the foreign key entry
+	createMe.FkGuestId = createMe.Self.GuestId
+
 	db := dh.conn.Debug().Create(&createMe)
 
 	if db.Error != nil {
 		return db.Error
 	}
 
-	for _, value := range createMe.Guests {
-		// TODO: use a method to create the inviteeguest and their self entry
+	for key, value := range createMe.Guests {
 		value.FkInviteeId = createMe.InviteeId
-		db.Create(&value)
 
-		if db.Error != nil {
-			return db.Error
+		cigErr := dh.createInviteeGuest(&value)
+
+		if cigErr != nil {
+			return cigErr
 		}
+
+		// assign the value so we can get the ids on the obj
+		createMe.Guests[key] = value
 	}
+
+	return db.Error
+}
+
+func (dh DataHandler) createGuest(createMe *entities.Guest) error {
+	db := dh.conn.Debug().Create(&createMe)
+
+	return db.Error
+}
+
+func (dh DataHandler) createInviteeGuest(createMe *entities.InviteeGuest) error {
+	// create the invitee guest self
+	cErr := dh.createGuest(&createMe.Self)
+
+	if cErr != nil {
+		return cErr
+	}
+
+	// assign the id of self to the foreign key entry
+	createMe.FkGuestId = createMe.Self.GuestId
+
+	db := dh.conn.Debug().Create(&createMe)
 
 	return db.Error
 }
