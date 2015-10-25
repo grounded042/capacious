@@ -7,12 +7,13 @@ import (
 	"net/http"
 
 	"github.com/grounded042/capacious/entities"
+	"github.com/grounded042/capacious/utils"
 	"github.com/zenazn/goji/web"
 )
 
 type EventsStub interface {
-	GetEvents() ([]entities.Event, error)
-	CreateEvent(*entities.Event) error
+	GetEvents() ([]entities.Event, utils.Error)
+	CreateEvent(*entities.Event) utils.Error
 }
 
 type EventsController struct {

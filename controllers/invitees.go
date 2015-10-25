@@ -7,16 +7,17 @@ import (
 	"net/http"
 
 	"github.com/grounded042/capacious/entities"
+	"github.com/grounded042/capacious/utils"
 	"github.com/zenazn/goji/web"
 )
 
 type InviteeStub interface {
-	GetInviteesForEvent(string) ([]entities.Invitee, error)
-	CreateInviteeForEvent(*entities.Invitee, entities.Event) error
-	GetInviteeFromId(string) (entities.Invitee, error)
-	EditInvitee(entities.Invitee) error
-	EditInviteeFriend(entities.InviteeFriend) error
-	CreateInviteeFriend(*entities.InviteeFriend) error
+	GetInviteesForEvent(string) ([]entities.Invitee, utils.Error)
+	CreateInviteeForEvent(*entities.Invitee, entities.Event) utils.Error
+	GetInviteeFromId(string) (entities.Invitee, utils.Error)
+	EditInvitee(entities.Invitee) utils.Error
+	EditInviteeFriend(entities.InviteeFriend) utils.Error
+	CreateInviteeFriend(*entities.InviteeFriend) utils.Error
 }
 
 type InviteesController struct {
@@ -34,7 +35,7 @@ func (ec InviteesController) GetInviteesForEvent(c web.C, w http.ResponseWriter,
 
 	if err != nil {
 		w.WriteHeader(500)
-		fmt.Println(err)
+		fmt.Println(err.Error())
 		return
 	}
 

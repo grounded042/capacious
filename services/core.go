@@ -3,6 +3,7 @@ package services
 import (
 	"github.com/grounded042/capacious/dal"
 	"github.com/grounded042/capacious/entities"
+	"github.com/grounded042/capacious/utils"
 )
 
 // the Coordinator coordinates interactions between different services.
@@ -24,11 +25,11 @@ func NewCoordinator(newDa dal.DataHandler) Coordinator {
 
 // events coordination
 
-func (c Coordinator) GetEvents() ([]entities.Event, error) {
+func (c Coordinator) GetEvents() ([]entities.Event, utils.Error) {
 	return c.events.GetEvents()
 }
 
-func (c Coordinator) CreateEvent(event *entities.Event) error {
+func (c Coordinator) CreateEvent(event *entities.Event) utils.Error {
 	return c.events.CreateEvent(event)
 }
 
@@ -36,28 +37,28 @@ func (c Coordinator) CreateEvent(event *entities.Event) error {
 
 // invitee coordination
 
-func (c Coordinator) GetInviteesForEvent(eventId string) ([]entities.Invitee, error) {
+func (c Coordinator) GetInviteesForEvent(eventId string) ([]entities.Invitee, utils.Error) {
 	return c.invitees.GetInviteesForEvent(eventId)
 }
 
-func (c Coordinator) CreateInviteeForEvent(invitee *entities.Invitee, event entities.Event) error {
+func (c Coordinator) CreateInviteeForEvent(invitee *entities.Invitee, event entities.Event) utils.Error {
 	return c.invitees.CreateInviteeForEvent(invitee, event)
 }
 
-func (c Coordinator) GetInviteeFromId(id string) (entities.Invitee, error) {
+func (c Coordinator) GetInviteeFromId(id string) (entities.Invitee, utils.Error) {
 	return c.invitees.GetInviteeFromId(id)
 }
 
-func (c Coordinator) EditInvitee(updateMe entities.Invitee) error {
+func (c Coordinator) EditInvitee(updateMe entities.Invitee) utils.Error {
 	return c.invitees.EditInvitee(updateMe)
 }
 
-func (c Coordinator) CreateInviteeFriend(updateMe *entities.InviteeFriend) error {
+func (c Coordinator) CreateInviteeFriend(updateMe *entities.InviteeFriend) utils.Error {
 	// TODO: make sure to constrain the number of friends here
 	return c.invitees.CreateInviteeFriend(updateMe)
 }
 
-func (c Coordinator) EditInviteeFriend(updateMe entities.InviteeFriend) error {
+func (c Coordinator) EditInviteeFriend(updateMe entities.InviteeFriend) utils.Error {
 	// TODO: make sure to constrain the number of friends here
 	return c.invitees.EditInviteeFriend(updateMe)
 }
