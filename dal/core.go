@@ -167,7 +167,7 @@ func (dh DataHandler) GetInviteeFromId(id string) (entities.Invitee, error) {
 		return entities.Invitee{}, db.Error
 	}
 
-	invitee.Self, db.Error = dh.getGuestFromId(invitee.FkGuestId)
+	invitee, db.Error = dh.addInviteeSelfToInvitee(invitee)
 
 	if db.Error != nil {
 		return entities.Invitee{}, db.Error
