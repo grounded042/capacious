@@ -1,6 +1,7 @@
 package dal
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -220,14 +221,35 @@ func (dh DataHandler) getGuestFromId(id string) (entities.Guest, error) {
 }
 
 func (dh DataHandler) UpdateInvitee(updateMe entities.Invitee) error {
-	// TODO: update all guests too
-	invitee, err := dh.GetInviteeFromId(updateMe.InviteeId)
+	// get the current invitee to diff
+	curInvitee, err := dh.GetInviteeFromId(updateMe.InviteeId)
 
 	if err != nil {
 		return err
 	}
 
-	updateMe.FkEventId = invitee.FkEventId
+	// update info from db
+	updateMe.FkEventId = curInvitee.FkEventId
+	updateMe.FkGuestId = curInvitee.FkGuestId
+
+	// check and make sure the self id is not different
+	if updateMe.FkGuestId != updateMe.Self.GuestId ||
+		updateMe.Self.GuestId != curInvitee.Self.GuestId {
+		return errors.New("bad invitee self id")
+	}
+
+	// update the invitee self
+	err = dh.updateGuest(updateMe.Self)
+
+	if err != nil {
+		return err
+	}
+
+	// lastly, update the invitee obj
+	db := dh.conn.Debug().Save(updateMe)
+
+	return db.Error
+}
 
 func (dh DataHandler) updateGuest(updateMe entities.Guest) error {
 	return dh.conn.Debug().Save(updateMe).Error
