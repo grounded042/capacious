@@ -54,9 +54,39 @@ func (dh DataHandler) GetAllInviteesForEvent(eventId string) ([]entities.Invitee
 		return []entities.Invitee{}, db.Error
 	}
 
-	// TODO: add self to each invitee object
+	invitees, db.Error = dh.addInviteeSelfToInvitees(invitees)
+
+	if db.Error != nil {
+		return []entities.Invitee{}, db.Error
+	}
 
 	return dh.addInviteeGuestsToInvitees(invitees)
+}
+
+func (dh DataHandler) addInviteeSelfToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
+	for key, value := range list {
+		invitee, err := dh.addInviteeSelfToInvitee(value)
+
+		if err != nil {
+			return []entities.Invitee{}, err
+		}
+
+		list[key] = invitee
+	}
+
+	return list, nil
+}
+
+func (dh DataHandler) addInviteeSelfToInvitee(invitee entities.Invitee) (entities.Invitee, error) {
+	var err error
+
+	invitee.Self, err = dh.getGuestFromId(invitee.FkGuestId)
+
+	if err != nil {
+		return entities.Invitee{}, err
+	}
+
+	return invitee, nil
 }
 
 func (dh DataHandler) addInviteeGuestsToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
