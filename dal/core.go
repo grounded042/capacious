@@ -61,7 +61,7 @@ func (dh DataHandler) GetAllInviteesForEvent(eventId string) ([]entities.Invitee
 		return []entities.Invitee{}, db.Error
 	}
 
-	return dh.addInviteeGuestsToInvitees(invitees)
+	return dh.addInviteeFriendsToInvitees(invitees)
 }
 
 func (dh DataHandler) addInviteeSelfToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
@@ -90,50 +90,50 @@ func (dh DataHandler) addInviteeSelfToInvitee(invitee entities.Invitee) (entitie
 	return invitee, nil
 }
 
-func (dh DataHandler) addInviteeGuestsToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
+func (dh DataHandler) addInviteeFriendsToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
 	for key, value := range list {
-		inviteeGuests, err := dh.GetInviteeGuestsFromInviteeId(value.InviteeId)
+		inviteeFriends, err := dh.GetInviteeFriendsFromInviteeId(value.InviteeId)
 
 		if err != nil {
 			return []entities.Invitee{}, err
 		}
 
-		list[key].Guests = inviteeGuests
+		list[key].Friends = inviteeFriends
 	}
 
 	return list, nil
 }
 
-func (dh DataHandler) addInviteeGuestsToInvitee(invitee entities.Invitee) (entities.Invitee, error) {
-	inviteeGuests, err := dh.GetInviteeGuestsFromInviteeId(invitee.InviteeId)
+func (dh DataHandler) addInviteeFriendsToInvitee(invitee entities.Invitee) (entities.Invitee, error) {
+	inviteeFriends, err := dh.GetInviteeFriendsFromInviteeId(invitee.InviteeId)
 
 	if err != nil {
 		return entities.Invitee{}, err
 	}
 
-	invitee.Guests = inviteeGuests
+	invitee.Friends = inviteeFriends
 
 	return invitee, nil
 }
 
-func (dh DataHandler) GetInviteeGuestsFromInviteeId(id string) ([]entities.InviteeGuest, error) {
-	var inviteeGuests []entities.InviteeGuest
+func (dh DataHandler) GetInviteeFriendsFromInviteeId(id string) ([]entities.InviteeFriend, error) {
+	var inviteeFriends []entities.InviteeFriend
 
-	db := dh.conn.Debug().Table("invitee_guests").Where("fk_invitee_id = ?", id).Find(&inviteeGuests)
+	db := dh.conn.Debug().Table("invitee_friends").Where("fk_invitee_id = ?", id).Find(&inviteeFriends)
 
 	if db.Error != nil {
-		return []entities.InviteeGuest{}, db.Error
+		return []entities.InviteeFriend{}, db.Error
 	}
 
-	for key, value := range inviteeGuests {
-		inviteeGuests[key].Self, db.Error = dh.getGuestFromId(value.FkGuestId)
+	for key, value := range inviteeFriends {
+		inviteeFriends[key].Self, db.Error = dh.getGuestFromId(value.FkGuestId)
 
 		if db.Error != nil {
-			return []entities.InviteeGuest{}, db.Error
+			return []entities.InviteeFriend{}, db.Error
 		}
 	}
 
-	return inviteeGuests, nil
+	return inviteeFriends, nil
 }
 
 func (dh DataHandler) CreateInvitee(createMe *entities.Invitee) error {
@@ -156,17 +156,17 @@ func (dh DataHandler) CreateInvitee(createMe *entities.Invitee) error {
 		return db.Error
 	}
 
-	for key, value := range createMe.Guests {
+	for key, value := range createMe.Friends {
 		value.FkInviteeId = createMe.InviteeId
 
-		cigErr := dh.CreateInviteeGuest(&value)
+		cigErr := dh.CreateInviteeFriend(&value)
 
 		if cigErr != nil {
 			return cigErr
 		}
 
 		// assign the value so we can get the ids on the obj
-		createMe.Guests[key] = value
+		createMe.Friends[key] = value
 	}
 
 	return db.Error
@@ -178,8 +178,8 @@ func (dh DataHandler) createGuest(createMe *entities.Guest) error {
 	return db.Error
 }
 
-func (dh DataHandler) CreateInviteeGuest(createMe *entities.InviteeGuest) error {
-	// create the invitee guest self
+func (dh DataHandler) CreateInviteeFriend(createMe *entities.InviteeFriend) error {
+	// create the invitee friend self
 	cErr := dh.createGuest(&createMe.Self)
 
 	if cErr != nil {
@@ -209,7 +209,7 @@ func (dh DataHandler) GetInviteeFromId(id string) (entities.Invitee, error) {
 		return entities.Invitee{}, db.Error
 	}
 
-	return dh.addInviteeGuestsToInvitee(invitee)
+	return dh.addInviteeFriendsToInvitee(invitee)
 }
 
 func (dh DataHandler) getGuestFromId(id string) (entities.Guest, error) {
@@ -255,8 +255,8 @@ func (dh DataHandler) updateGuest(updateMe entities.Guest) error {
 	return dh.conn.Debug().Save(updateMe).Error
 }
 
-func (dh DataHandler) UpdateInviteeGuest(updateMe entities.InviteeGuest) error {
-	curIG, err := dh.GetInviteeGuestFromId(updateMe.InviteeGuestId)
+func (dh DataHandler) UpdateInviteeFriend(updateMe entities.InviteeFriend) error {
+	curIG, err := dh.GetInviteeFriendFromId(updateMe.InviteeFriendId)
 
 	if err != nil {
 		return err
@@ -268,10 +268,10 @@ func (dh DataHandler) UpdateInviteeGuest(updateMe entities.InviteeGuest) error {
 
 	// check and make sure the self id is not different
 	if updateMe.FkGuestId != updateMe.Self.GuestId {
-		return errors.New("bad invitee guest self id")
+		return errors.New("bad invitee friend self id")
 	}
 
-	// update the invitee guest self
+	// update the invitee friend self
 	err = dh.updateGuest(updateMe.Self)
 
 	if err != nil {
@@ -285,16 +285,16 @@ func (dh DataHandler) UpdateInviteeGuest(updateMe entities.InviteeGuest) error {
 
 }
 
-func (dh DataHandler) GetInviteeGuestFromId(id string) (entities.InviteeGuest, error) {
-	var iGuest entities.InviteeGuest
+func (dh DataHandler) GetInviteeFriendFromId(id string) (entities.InviteeFriend, error) {
+	var friend entities.InviteeFriend
 
-	db := dh.conn.Debug().Where("invitee_guest_id = ?", id).First(&iGuest)
+	db := dh.conn.Debug().Where("invitee_friend_id = ?", id).First(&friend)
 
 	if db.Error != nil {
-		return entities.InviteeGuest{}, db.Error
+		return entities.InviteeFriend{}, db.Error
 	}
 
-	iGuest.Self, db.Error = dh.getGuestFromId(iGuest.FkGuestId)
+	friend.Self, db.Error = dh.getGuestFromId(friend.FkGuestId)
 
-	return iGuest, db.Error
+	return friend, db.Error
 }

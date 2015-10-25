@@ -8,7 +8,7 @@ CREATE TABLE events (
     description varchar(255) NOT NULL,
     start_time timestamp,
     end_time timestamp,
-    allowed_guests int,
+    allowed_friends int,
     created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp
 );
@@ -31,8 +31,8 @@ CREATE TABLE invitees (
     updated_at timestamp default current_timestamp
 );
 
-CREATE TABLE invitee_guests (
-	invitee_guest_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
+CREATE TABLE invitee_friends (
+	invitee_friend_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
 	fk_invitee_id uuid REFERENCES invitees (invitee_id),
 	fk_guest_id uuid REFERENCES guests (guest_id),
 	created_at timestamp default current_timestamp,

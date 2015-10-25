@@ -15,8 +15,8 @@ type InviteeStub interface {
 	CreateInviteeForEvent(*entities.Invitee, entities.Event) error
 	GetInviteeFromId(string) (entities.Invitee, error)
 	EditInvitee(entities.Invitee) error
-	EditInviteeGuest(entities.InviteeGuest) error
-	CreateInviteeGuest(*entities.InviteeGuest) error
+	EditInviteeFriend(entities.InviteeFriend) error
+	CreateInviteeFriend(*entities.InviteeFriend) error
 }
 
 type InviteesController struct {
@@ -110,8 +110,8 @@ func (ic InviteesController) EditInvitee(c web.C, w http.ResponseWriter, r *http
 	}
 }
 
-func (ic InviteesController) EditInviteeGuest(c web.C, w http.ResponseWriter, r *http.Request) {
-	iGuest := entities.InviteeGuest{InviteeGuestId: c.URLParams["guest_id"], FkInviteeId: c.URLParams["invitee_id"]}
+func (ic InviteesController) EditInviteeFriend(c web.C, w http.ResponseWriter, r *http.Request) {
+	iGuest := entities.InviteeFriend{InviteeFriendId: c.URLParams["guest_id"], FkInviteeId: c.URLParams["invitee_id"]}
 
 	rBody, ioErr := ioutil.ReadAll(r.Body)
 
@@ -127,7 +127,7 @@ func (ic InviteesController) EditInviteeGuest(c web.C, w http.ResponseWriter, r 
 		return
 	}
 
-	err := ic.is.EditInviteeGuest(iGuest)
+	err := ic.is.EditInviteeFriend(iGuest)
 
 	if err != nil {
 		w.WriteHeader(500)
@@ -139,8 +139,8 @@ func (ic InviteesController) EditInviteeGuest(c web.C, w http.ResponseWriter, r 
 
 }
 
-func (ec InviteesController) CreateInviteeGuest(c web.C, w http.ResponseWriter, r *http.Request) {
-	iGuest := entities.InviteeGuest{FkInviteeId: c.URLParams["invitee_id"]}
+func (ec InviteesController) CreateInviteeFriend(c web.C, w http.ResponseWriter, r *http.Request) {
+	iGuest := entities.InviteeFriend{FkInviteeId: c.URLParams["invitee_id"]}
 
 	rBody, ioErr := ioutil.ReadAll(r.Body)
 
@@ -156,7 +156,7 @@ func (ec InviteesController) CreateInviteeGuest(c web.C, w http.ResponseWriter, 
 		return
 	}
 
-	if err := ec.is.CreateInviteeGuest(&iGuest); err != nil {
+	if err := ec.is.CreateInviteeFriend(&iGuest); err != nil {
 		w.WriteHeader(500)
 		fmt.Println(err)
 	} else {

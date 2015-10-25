@@ -16,13 +16,13 @@ func InviteeRoutes(cl controllers.List) []Route {
 		},
 		Route{
 			Method:  "patch",
-			Pattern: "/invitees/:invitee_id/relationships/guests/:guest_id",
-			Handler: cl.Invitees.EditInviteeGuest,
+			Pattern: "/invitees/:invitee_id/relationships/friends/:guest_id",
+			Handler: cl.Invitees.EditInviteeFriend,
 		},
 		Route{
 			Method:  "post",
-			Pattern: "/invitees/:invitee_id/relationships/guests",
-			Handler: cl.Invitees.CreateInviteeGuest,
+			Pattern: "/invitees/:invitee_id/relationships/friends",
+			Handler: cl.Invitees.CreateInviteeFriend,
 		},
 	}
 }

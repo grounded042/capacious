@@ -31,9 +31,10 @@ BEGIN
         '24669e54-5ee2-11e5-a379-7b2796b289b2', 'shale@mann.co'
     );
 
-    INSERT INTO invitee_guests(fk_invitee_id, fk_guest_id)
+    INSERT INTO invitee_friends(invitee_friend_id, fk_invitee_id, fk_guest_id)
     VALUES (
-        'fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068', '81e6d338-7917-11e5-8b8e-a37beb0fdab8'
+        'e6afb5b0-7b64-11e5-b861-1f0fc9657754', 'fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068', 
+        '81e6d338-7917-11e5-8b8e-a37beb0fdab8'
     );
 
 END $$

@@ -23,21 +23,21 @@ type Guest struct {
 }
 
 type Invitee struct {
-	InviteeId string         `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"invitee_id"`
-	FkEventId string         `json:"-"`
-	FkGuestId string         `json:"-"`
-	Email     string         `json:"email"`
-	Self      Guest          `json:"self"`
-	Guests    []InviteeGuest `json:"guests"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
+	InviteeId string          `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"invitee_id"`
+	FkEventId string          `json:"-"`
+	FkGuestId string          `json:"-"`
+	Email     string          `json:"email"`
+	Self      Guest           `json:"self"`
+	Friends   []InviteeFriend `json:"friends"`
+	CreatedAt time.Time       `json:"created_at"`
+	UpdatedAt time.Time       `json:"updated_at"`
 }
 
-type InviteeGuest struct {
-	InviteeGuestId string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"invitee_guest_id"`
-	FkInviteeId    string    `json:"-"`
-	FkGuestId      string    `json:"-"`
-	Self           Guest     `json:"self"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+type InviteeFriend struct {
+	InviteeFriendId string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"invitee_friend_id"`
+	FkInviteeId     string    `json:"-"`
+	FkGuestId       string    `json:"-"`
+	Self            Guest     `json:"self"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
 }

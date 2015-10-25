@@ -52,14 +52,14 @@ func (c Coordinator) EditInvitee(updateMe entities.Invitee) error {
 	return c.invitees.EditInvitee(updateMe)
 }
 
-func (c Coordinator) CreateInviteeGuest(updateMe *entities.InviteeGuest) error {
-	// TODO: make sure to constrain the number of guests here
-	return c.invitees.CreateInviteeGuest(updateMe)
+func (c Coordinator) CreateInviteeFriend(updateMe *entities.InviteeFriend) error {
+	// TODO: make sure to constrain the number of friends here
+	return c.invitees.CreateInviteeFriend(updateMe)
 }
 
-func (c Coordinator) EditInviteeGuest(updateMe entities.InviteeGuest) error {
-	// TODO: make sure to constrain the number of guests here
-	return c.invitees.EditInviteeGuest(updateMe)
+func (c Coordinator) EditInviteeFriend(updateMe entities.InviteeFriend) error {
+	// TODO: make sure to constrain the number of friends here
+	return c.invitees.EditInviteeFriend(updateMe)
 }
 
 //end invitee coordination

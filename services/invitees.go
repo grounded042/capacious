@@ -19,12 +19,12 @@ type inviteeGateway interface {
 	// UpdateInvitee updates an invitee in the database
 	// with info from the passed in object
 	UpdateInvitee(entities.Invitee) error
-	// CreateInviteeGuest create and invitee guest from
+	// CreateInviteeFriend create and invitee guest from
 	// a supplied invitee guest object
-	CreateInviteeGuest(*entities.InviteeGuest) error
-	// UpdateInviteeGuest update an invitee guest in the
+	CreateInviteeFriend(*entities.InviteeFriend) error
+	// UpdateInviteeFriend update an invitee guest in the
 	// database with info from the passed in object
-	UpdateInviteeGuest(entities.InviteeGuest) error
+	UpdateInviteeFriend(entities.InviteeFriend) error
 }
 
 // the invitee is a subset of the event object -
@@ -80,8 +80,8 @@ func (is inviteeService) EditInvitee(updateMe entities.Invitee) utils.Error {
 	return nil
 }
 
-func (is inviteeService) CreateInviteeGuest(iGuest *entities.InviteeGuest) utils.Error {
-	err := is.da.CreateInviteeGuest(iGuest)
+func (is inviteeService) CreateInviteeFriend(friend *entities.InviteeFriend) utils.Error {
+	err := is.da.CreateInviteeFriend(friend)
 
 	if err != nil {
 		return utils.NewApiError(500, err.Error())
@@ -90,8 +90,8 @@ func (is inviteeService) CreateInviteeGuest(iGuest *entities.InviteeGuest) utils
 	return nil
 }
 
-func (is inviteeService) EditInviteeGuest(updateMe entities.InviteeGuest) utils.Error {
-	err := is.da.UpdateInviteeGuest(updateMe)
+func (is inviteeService) EditInviteeFriend(updateMe entities.InviteeFriend) utils.Error {
+	err := is.da.UpdateInviteeFriend(updateMe)
 
 	if err != nil {
 		return utils.NewApiError(500, err.Error())
