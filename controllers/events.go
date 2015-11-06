@@ -13,6 +13,7 @@ import (
 
 type EventsStub interface {
 	GetEvents() ([]entities.Event, utils.Error)
+	GetEventInfo(eventId string) (entities.Event, utils.Error)
 	CreateEvent(*entities.Event) utils.Error
 }
 
@@ -34,6 +35,17 @@ func (ec EventsController) GetEvents(c web.C, w http.ResponseWriter, r *http.Req
 	} else {
 		w.WriteHeader(200)
 		json.NewEncoder(w).Encode(events)
+	}
+}
+
+func (ec EventsController) GetEventInfo(c web.C, w http.ResponseWriter, r *http.Request) {
+
+	if event, err := ec.es.GetEventInfo(c.URLParams["id"]); err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(event)
 	}
 }
 

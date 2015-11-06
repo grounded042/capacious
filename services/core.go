@@ -29,6 +29,10 @@ func (c Coordinator) GetEvents() ([]entities.Event, utils.Error) {
 	return c.events.GetEvents()
 }
 
+func (c Coordinator) GetEventInfo(eventId string) (entities.Event, utils.Error) {
+	return c.events.GetEventInfo(eventId)
+}
+
 func (c Coordinator) CreateEvent(event *entities.Event) utils.Error {
 	return c.events.CreateEvent(event)
 }

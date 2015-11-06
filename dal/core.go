@@ -40,6 +40,14 @@ func (dh DataHandler) GetAllEvents() ([]entities.Event, error) {
 	return events, db.Error
 }
 
+func (dh DataHandler) GetEventInfo(eventId string) (entities.Event, error) {
+	var event = entities.Event{EventId: eventId}
+
+	db := dh.conn.Find(&event)
+
+	return event, db.Error
+}
+
 func (dh DataHandler) CreateEvent(createMe *entities.Event) error {
 	db := dh.conn.Create(&createMe)
 
