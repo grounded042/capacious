@@ -5,6 +5,7 @@ import (
 
 	"github.com/grounded042/capacious/controllers"
 	"github.com/grounded042/capacious/dal"
+	"github.com/grounded042/capacious/middleware"
 	"github.com/grounded042/capacious/routes"
 	"github.com/grounded042/capacious/services"
 	"github.com/zenazn/goji"
@@ -21,6 +22,10 @@ func main() {
 
 	capaciousAPIServer := goji.DefaultMux
 	ac := getAppContext()
+
+	// apply the middleware
+	goji.Use(middleware.ContentTypeHeader)
+	goji.Use(middleware.CORS)
 
 	routes.BuildRoutes(capaciousAPIServer, routes.EventRoutes(ac.Controllers), *prefix)
 	routes.BuildRoutes(capaciousAPIServer, routes.InviteeRoutes(ac.Controllers), *prefix)
