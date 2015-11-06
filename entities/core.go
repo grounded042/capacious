@@ -6,6 +6,7 @@ type Event struct {
 	EventId       string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"event_id"`
 	Name          string    `json:"name"`
 	Description   string    `json:"description"`
+	Location      string    `json:"location"`
 	StartTime     time.Time `json:"start_time"`
 	EndTime       time.Time `json:"end_time"`
 	AllowedGuests int       `json:"allowed_guests"`

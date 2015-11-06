@@ -6,6 +6,7 @@ CREATE TABLE events (
     event_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
     name varchar(255) NOT NULL UNIQUE,
     description varchar(255) NOT NULL,
+    location varchar(255) NOT NULL,
     start_time timestamp,
     end_time timestamp,
     allowed_friends int,
