@@ -21,7 +21,8 @@ func CORS(c *web.C, h http.Handler) http.Handler {
 	cors := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedHeaders: []string{"*"},
-		Debug:          false,
+		AllowedMethods: []string{"GET", "POST", "PATCH"},
+		Debug:          true,
 	})
 
 	return cors.Handler(h)
