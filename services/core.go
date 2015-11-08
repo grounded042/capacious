@@ -88,12 +88,67 @@ func (c Coordinator) SetInviteeFriendMenuChoices(iFriendID string, choices []ent
 		return []entities.MenuChoice{}, err
 	}
 
-	return c.SetGuestMenuChoices(iFriend.FkGuestId, choices)
+	invitee, err := c.invitees.GetInviteeFromId(iFriend.FkInviteeId)
+
+	if err != nil {
+		return []entities.MenuChoice{}, err
+	}
+
+	return c.SetGuestMenuChoices(invitee.FkEventId, iFriend.FkGuestId, choices)
 }
 
-func (c Coordinator) SetGuestMenuChoices(guestID string, choices []entities.MenuChoice) ([]entities.MenuChoice, utils.Error) {
+func (c Coordinator) SetGuestMenuChoices(eventID string, guestID string, choices []entities.MenuChoice) ([]entities.MenuChoice, utils.Error) {
 	// TODO: validate the menu choices
+	items, err := c.events.GetMenuItemsForEvent(eventID)
+
+	if err != nil {
+		return []entities.MenuChoice{}, err
+	}
+
+	if !c.validateMenuChoicesWithMenuItems(choices, items) {
+		return []entities.MenuChoice{}, utils.NewApiError(400, "So yeah...you had an error in the list of menu choices you sent in. Rejected!")
+	}
+
 	return c.invitees.SetGuestMenuChoices(guestID, choices)
+}
+
+// validateMenuChoicesWithMenuItems validates that the supplied choices match
+// up with the supplied menu items. It returns a bool regarding the validity.
+// TODO: unit test this sucker
+func (c Coordinator) validateMenuChoicesWithMenuItems(choices []entities.MenuChoice, items []entities.MenuItem) bool {
+	itemUsage := make(map[string]int)
+
+	for _, cValue := range choices {
+		itemMatch := false
+		// what item does the current choice align to?
+		for _, iValue := range items {
+			for _, oValue := range iValue.Options {
+				if oValue.MenuItemOptionId == cValue.FkMenuItemOptionId {
+					// we found an item option that matches the choice id,
+					// so we have validated that the choice is valid
+					itemMatch = true
+
+					// up the count for the number of times a choice has been used for an item
+					itemUsage[iValue.MenuItemId] = itemUsage[iValue.MenuItemId] + 1
+
+					// is the number of choices higher than the number of choices allowed?
+					if itemUsage[iValue.MenuItemId] > iValue.NumChoices {
+						return false
+					}
+
+				}
+			}
+		}
+
+		// check and see if the choice matched up with an option in an item
+		if !itemMatch {
+			return false
+		}
+
+	}
+
+	// if we made it this far, we are good!
+	return true
 }
 
 //end invitee coordination
