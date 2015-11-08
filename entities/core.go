@@ -42,3 +42,21 @@ type InviteeFriend struct {
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
 }
+
+type MenuItem struct {
+	MenuItemId string           `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"menu_item_id"`
+	FkEventId  string           `json:"-"`
+	ItemOrder  int              `json:"item_order"`
+	Name       string           `json:"name"`
+	NumChoices int              `json:"num_choices"`
+	Options    []MenuItemOption `json:"options"`
+	CreatedAt  time.Time        `json:"created_at"`
+	UpdatedAt  time.Time        `json:"updated_at"`
+}
+
+type MenuItemOption struct {
+	MenuItemOptionId string `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"menu_item_option_id"`
+	FkMenuItemId     string `json:"-"`
+	Name             string `json:"name"`
+	Description      string `json:"description"`
+}
