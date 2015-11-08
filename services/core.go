@@ -78,7 +78,7 @@ func (c Coordinator) SetInviteeMenuChoices(inviteeID string, choices []entities.
 		return []entities.MenuChoice{}, err
 	}
 
-	return c.SetGuestMenuChoices(invitee.Self.GuestId, choices)
+	return c.SetGuestMenuChoices(invitee.FkEventId, invitee.Self.GuestId, choices)
 }
 
 func (c Coordinator) SetInviteeFriendMenuChoices(iFriendID string, choices []entities.MenuChoice) ([]entities.MenuChoice, utils.Error) {
