@@ -198,7 +198,7 @@ func (ec InviteesController) SetInviteeMenuChoices(c web.C, w http.ResponseWrite
 }
 
 func (ec InviteesController) SetGuestMenuChoices(c web.C, w http.ResponseWriter, r *http.Request) {
-	guestID := c.URLParams["guest_id"]
+	guestID := c.URLParams["friend_id"]
 	var choices []entities.MenuChoice
 
 	rBody, ioErr := ioutil.ReadAll(r.Body)

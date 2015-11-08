@@ -16,7 +16,7 @@ func InviteeRoutes(cl controllers.List) []Route {
 		},
 		Route{
 			Method:  "patch",
-			Pattern: "/invitees/:invitee_id/relationships/friends/:guest_id",
+			Pattern: "/invitees/:invitee_id/relationships/friends/:friend_id",
 			Handler: cl.Invitees.EditInviteeFriend,
 		},
 		Route{
@@ -33,7 +33,7 @@ func InviteeRoutes(cl controllers.List) []Route {
 		// maybe a guest controller
 		Route{
 			Method:  "post",
-			Pattern: "/invitees/:invitee_id/relationships/friends/:guest_id/relationships/menu_choices",
+			Pattern: "/invitees/:invitee_id/relationships/friends/:friend_id/relationships/menu_choices",
 			Handler: cl.Invitees.SetGuestMenuChoices,
 		},
 	}
