@@ -81,6 +81,16 @@ func (c Coordinator) SetInviteeMenuChoices(inviteeID string, choices []entities.
 	return c.SetGuestMenuChoices(invitee.Self.GuestId, choices)
 }
 
+func (c Coordinator) SetInviteeFriendMenuChoices(iFriendID string, choices []entities.MenuChoice) ([]entities.MenuChoice, utils.Error) {
+	iFriend, err := c.invitees.GetInviteeFriendFromId(iFriendID)
+
+	if err != nil {
+		return []entities.MenuChoice{}, err
+	}
+
+	return c.SetGuestMenuChoices(iFriend.FkGuestId, choices)
+}
+
 func (c Coordinator) SetGuestMenuChoices(guestID string, choices []entities.MenuChoice) ([]entities.MenuChoice, utils.Error) {
 	// TODO: validate the menu choices
 	return c.invitees.SetGuestMenuChoices(guestID, choices)

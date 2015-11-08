@@ -16,6 +16,9 @@ type inviteeGateway interface {
 	// GetInviteeFromId fetches an invitee from the database
 	// based on the supplied id
 	GetInviteeFromId(string) (entities.Invitee, error)
+	// GetInviteeFriendFromId fetches an invitee friend from the
+	// database based on the supplied id
+	GetInviteeFriendFromId(string) (entities.InviteeFriend, error)
 	// UpdateInvitee updates an invitee in the database
 	// with info from the passed in object
 	UpdateInvitee(entities.Invitee) error
@@ -116,4 +119,14 @@ func (is inviteeService) SetGuestMenuChoices(guestID string, choices []entities.
 	}
 
 	return updatedChoices, nil
+}
+
+func (is inviteeService) GetInviteeFriendFromId(id string) (entities.InviteeFriend, utils.Error) {
+	iFriend, err := is.da.GetInviteeFriendFromId(id)
+
+	if err != nil {
+		return entities.InviteeFriend{}, utils.NewApiError(500, err.Error())
+	}
+
+	return iFriend, nil
 }
