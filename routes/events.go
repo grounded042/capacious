@@ -29,5 +29,10 @@ func EventRoutes(cl controllers.List) []Route {
 			Pattern: "/events/:id/relationships/invitees",
 			Handler: cl.Invitees.CreateInviteeForEvent,
 		},
+		Route{
+			Method:  "get",
+			Pattern: "/events/:id/relationships/menu_items",
+			Handler: cl.Events.GetMenuItemsForEvent,
+		},
 	}
 }

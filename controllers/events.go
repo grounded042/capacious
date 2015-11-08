@@ -15,6 +15,7 @@ type EventsStub interface {
 	GetEvents() ([]entities.Event, utils.Error)
 	GetEventInfo(eventId string) (entities.Event, utils.Error)
 	CreateEvent(*entities.Event) utils.Error
+	GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, utils.Error)
 }
 
 type EventsController struct {
@@ -72,5 +73,16 @@ func (ec EventsController) CreateEvent(c web.C, w http.ResponseWriter, r *http.R
 	} else {
 		w.WriteHeader(200)
 		json.NewEncoder(w).Encode(event)
+	}
+}
+
+// GetMenuItemsForEvent renders the menu items for an event using w.
+func (ec EventsController) GetMenuItemsForEvent(c web.C, w http.ResponseWriter, r *http.Request) {
+	if items, err := ec.es.GetMenuItemsForEvent(c.URLParams["id"]); err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(items)
 	}
 }

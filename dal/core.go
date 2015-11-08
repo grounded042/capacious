@@ -306,3 +306,62 @@ func (dh DataHandler) GetInviteeFriendFromId(id string) (entities.InviteeFriend,
 
 	return friend, db.Error
 }
+
+// GetMenuItemsForEvent gets the menu items for an event bases on the
+// event id eventID. It returns a slice of menu items and any errors that
+// occured.
+func (dh DataHandler) GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, error) {
+	var items = []entities.MenuItem{}
+
+	db := dh.conn.Where("fk_event_id = ?", eventID).Find(&items)
+
+	if db.Error != nil {
+		return []entities.MenuItem{}, db.Error
+	}
+
+	return dh.addMenuItemOptionsToMenuItems(items)
+}
+
+// addMenuItemOptionsToMenuItems adds all of the possible options for a
+// menu item to that item object in the supplied entities.MenuItem slice.
+// It returns a slice of items with the options added and any error that
+// occured.
+func (dh DataHandler) addMenuItemOptionsToMenuItems(items []entities.MenuItem) ([]entities.MenuItem, error) {
+	for key, value := range items {
+		newItem, err := dh.addMenuItemOptionToMenuItem(value)
+
+		if err != nil {
+			return items, err
+		}
+
+		items[key] = newItem
+	}
+
+	return items, nil
+}
+
+// addMenuItemOptionToMenuItem adds the possible options for a menu item to
+// the supplied entities.MenuItem object. It returns the item with the options
+// added and any error that occured.
+func (dh DataHandler) addMenuItemOptionToMenuItem(item entities.MenuItem) (entities.MenuItem, error) {
+	opts, err := dh.getMenuItemOptionsForMenuItemID(item.MenuItemId)
+
+	if err != nil {
+		return item, err
+	}
+
+	item.Options = opts
+
+	return item, nil
+}
+
+// getMenuItemOptionsForMenuItemID gets the menu item options associated with
+// the supplied menuItemID. It returns a slice of the entities.MenuItemOptions
+// and any error that occured.
+func (dh DataHandler) getMenuItemOptionsForMenuItemID(menuItemID string) ([]entities.MenuItemOption, error) {
+	var opts []entities.MenuItemOption
+
+	db := dh.conn.Debug().Table("menu_item_options").Where("fk_menu_item_id = ?", menuItemID).Find(&opts)
+
+	return opts, db.Error
+}

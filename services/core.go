@@ -37,6 +37,10 @@ func (c Coordinator) CreateEvent(event *entities.Event) utils.Error {
 	return c.events.CreateEvent(event)
 }
 
+func (c Coordinator) GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, utils.Error) {
+	return c.events.GetMenuItemsForEvent(eventID)
+}
+
 // end events coordination
 
 // invitee coordination

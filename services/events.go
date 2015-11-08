@@ -17,6 +17,9 @@ type eventsGateway interface {
 	// GetEventInfo gets the info for an event matching
 	// the supplied event id
 	GetEventInfo(eventId string) (entities.Event, error)
+	// GetMenuItemsForEvent gets all of the menu items
+	// for an event matching the supplied event id
+	GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, error)
 }
 
 type eventsService struct {
@@ -57,4 +60,16 @@ func (es eventsService) CreateEvent(event *entities.Event) utils.Error {
 	}
 
 	return nil
+}
+
+// GetMenuItemsForEvent gets the menu items based on the event id
+// eventID. It returns a slice of menu items and any errors that occured.
+func (es eventsService) GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, utils.Error) {
+	items, err := es.da.GetMenuItemsForEvent(eventID)
+
+	if err != nil {
+		return []entities.MenuItem{}, utils.NewApiError(500, err.Error())
+	}
+
+	return items, nil
 }
