@@ -20,7 +20,7 @@ CREATE TABLE guests (
   last_name varchar(255) NOT NULL,
   attending boolean DEFAULT false,
   created_at timestamp default current_timestamp,
-    updated_at timestamp default current_timestamp
+  updated_at timestamp default current_timestamp
 );
 
 CREATE TABLE invitees (
@@ -56,6 +56,14 @@ CREATE TABLE menu_item_options (
   fk_menu_item_id uuid REFERENCES menu_items (menu_item_id),
   name varchar(255),
   description varchar(255),
+  created_at timestamp default current_timestamp,
+  updated_at timestamp default current_timestamp
+);
+
+CREATE TABLE menu_choices (
+  menu_choice_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
+  fk_guest_id uuid REFERENCES guests (guest_id),
+  fk_menu_item_option_id uuid REFERENCES menu_item_options (menu_item_option_id),
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp
 );
