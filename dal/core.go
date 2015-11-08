@@ -222,10 +222,28 @@ func (dh DataHandler) GetInviteeFromId(id string) (entities.Invitee, error) {
 
 func (dh DataHandler) getGuestFromId(id string) (entities.Guest, error) {
 	var guest entities.Guest
+	var err error
 
 	db := dh.conn.Debug().Where("guest_id = ?", id).First(&guest)
 
-	return guest, db.Error
+	// get the guests menu options
+	if db.Error != nil {
+		return entities.Guest{}, db.Error
+	}
+
+	guest.MenuChoices, err = dh.getMenuChoicesForGuestID(guest.GuestId)
+
+	return guest, err
+}
+
+// getMenuChoicesForGuestID gets the menu choices associated with the supplied guestID.
+// It returns a slice of entities.MenuChoice objs and any error that occured.
+func (dh DataHandler) getMenuChoicesForGuestID(guestID string) ([]entities.MenuChoice, error) {
+	var choices []entities.MenuChoice
+
+	db := dh.conn.Debug().Where("fk_guest_id = ?", guestID).Find(&choices)
+
+	return choices, db.Error
 }
 
 func (dh DataHandler) UpdateInvitee(updateMe entities.Invitee) error {

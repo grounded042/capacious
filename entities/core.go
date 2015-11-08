@@ -15,12 +15,13 @@ type Event struct {
 }
 
 type Guest struct {
-	GuestId   string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"guest_id"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	Attending bool      `json:"attending"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	GuestId     string       `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"guest_id"`
+	FirstName   string       `json:"first_name"`
+	LastName    string       `json:"last_name"`
+	Attending   bool         `json:"attending"`
+	MenuChoices []MenuChoice `json:"menu_choices"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
 }
 
 type Invitee struct {
@@ -55,8 +56,18 @@ type MenuItem struct {
 }
 
 type MenuItemOption struct {
-	MenuItemOptionId string `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"menu_item_option_id"`
-	FkMenuItemId     string `json:"-"`
-	Name             string `json:"name"`
-	Description      string `json:"description"`
+	MenuItemOptionId string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"menu_item_option_id"`
+	FkMenuItemId     string    `json:"-"`
+	Name             string    `json:"name"`
+	Description      string    `json:"description"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
+}
+
+type MenuChoice struct {
+	MenuChoiceId       string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"menu_item_option_id"`
+	FkGuestId          string    `json:"-"`
+	FkMenuItemOptionId string    `json:"-"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
 }
