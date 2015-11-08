@@ -383,3 +383,36 @@ func (dh DataHandler) getMenuItemOptionsForMenuItemID(menuItemID string) ([]enti
 
 	return opts, db.Error
 }
+
+func (dh DataHandler) SetGuestMenuChoices(guestID string, choices []entities.MenuChoice) ([]entities.MenuChoice, error) {
+	// delete all the current choices
+	//  get all the current choices
+	oldChoices, err := dh.getMenuChoicesForGuestID(guestID)
+
+	if err != nil {
+		return []entities.MenuChoice{}, err
+	}
+
+	if len(oldChoices) > 0 {
+		for _, value := range oldChoices {
+			db := dh.conn.Debug().Delete(value)
+
+			if db.Error != nil {
+				return []entities.MenuChoice{}, db.Error
+			}
+		}
+	}
+
+	// add the new choices
+	for key, value := range choices {
+		db := dh.conn.Debug().Create(&value)
+
+		if db.Error != nil {
+			return []entities.MenuChoice{}, db.Error
+		}
+
+		choices[key] = value
+	}
+
+	return choices, nil
+}

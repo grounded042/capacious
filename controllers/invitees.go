@@ -18,6 +18,7 @@ type InviteeStub interface {
 	EditInvitee(entities.Invitee) utils.Error
 	EditInviteeFriend(entities.InviteeFriend) utils.Error
 	CreateInviteeFriend(*entities.InviteeFriend) utils.Error
+	SetInviteeMenuChoices(string, []entities.MenuChoice) ([]entities.MenuChoice, utils.Error)
 }
 
 type InviteesController struct {
@@ -163,5 +164,34 @@ func (ec InviteesController) CreateInviteeFriend(c web.C, w http.ResponseWriter,
 	} else {
 		w.WriteHeader(200)
 		json.NewEncoder(w).Encode(iGuest)
+	}
+}
+
+func (ec InviteesController) SetMenuChoices(c web.C, w http.ResponseWriter, r *http.Request) {
+	inviteeID := c.URLParams["invitee_id"]
+	var choices []entities.MenuChoice
+
+	rBody, ioErr := ioutil.ReadAll(r.Body)
+
+	if ioErr != nil {
+		w.WriteHeader(500)
+		fmt.Println(ioErr)
+		return
+	}
+
+	if err := json.Unmarshal(rBody, &choices); err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+		return
+	}
+
+	updatedChoices, err := ec.is.SetInviteeMenuChoices(inviteeID, choices)
+
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(updatedChoices)
 	}
 }

@@ -22,9 +22,12 @@ type inviteeGateway interface {
 	// CreateInviteeFriend create and invitee guest from
 	// a supplied invitee guest object
 	CreateInviteeFriend(*entities.InviteeFriend) error
-	// UpdateInviteeFriend update an invitee guest in the
+	// UpdateInviteeFriend updates an invitee guest in the
 	// database with info from the passed in object
 	UpdateInviteeFriend(entities.InviteeFriend) error
+	// SetGuestMenuChoices sets the menu choices with the
+	// supplied choices for the supplied guest id
+	SetGuestMenuChoices(string, []entities.MenuChoice) ([]entities.MenuChoice, error)
 }
 
 // the invitee is a subset of the event object -
@@ -98,4 +101,19 @@ func (is inviteeService) EditInviteeFriend(updateMe entities.InviteeFriend) util
 	}
 
 	return nil
+}
+
+func (is inviteeService) SetGuestMenuChoices(guestID string, choices []entities.MenuChoice) ([]entities.MenuChoice, utils.Error) {
+	// make sure that the FkGuestId is set correctly
+	for key, _ := range choices {
+		choices[key].FkGuestId = guestID
+	}
+
+	updatedChoices, err := is.da.SetGuestMenuChoices(guestID, choices)
+
+	if err != nil {
+		return []entities.MenuChoice{}, utils.NewApiError(500, err.Error())
+	}
+
+	return updatedChoices, nil
 }
