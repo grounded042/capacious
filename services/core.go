@@ -98,7 +98,6 @@ func (c Coordinator) SetInviteeFriendMenuChoices(iFriendID string, choices []ent
 }
 
 func (c Coordinator) SetGuestMenuChoices(eventID string, guestID string, choices []entities.MenuChoice) ([]entities.MenuChoice, utils.Error) {
-	// TODO: validate the menu choices
 	items, err := c.events.GetMenuItemsForEvent(eventID)
 
 	if err != nil {
