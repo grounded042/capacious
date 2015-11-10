@@ -141,4 +141,9 @@ BEGIN
       '81e6d338-7917-11e5-8b8e-a37beb0fdab8', '3AB2FDB8-8658-11E5-9E1B-CF4A9AFB8DEF'
     );
 
+    INSERT INTO menu_notes(fk_guest_id, note_body)
+    VALUES (
+      '24669e54-5ee2-11e5-a379-7b2796b289b2', 'Could I have some wine with the cheese and crackers?'
+    );
+
 END $$

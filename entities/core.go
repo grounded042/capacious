@@ -20,6 +20,7 @@ type Guest struct {
 	LastName    string       `json:"last_name"`
 	Attending   bool         `json:"attending"`
 	MenuChoices []MenuChoice `json:"menu_choices"`
+	MenuNote    string       `json:"menu_note"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 }
@@ -70,4 +71,12 @@ type MenuChoice struct {
 	FkMenuItemOptionId string    `json:"menu_item_option_id"`
 	CreatedAt          time.Time `json:"created_at"`
 	UpdatedAt          time.Time `json:"updated_at"`
+}
+
+type MenuNote struct {
+	MenuNoteId string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"menu_note_id"`
+	FkGuestId  string    `json:"-"`
+	NoteBody   string    `json:"note_body"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }

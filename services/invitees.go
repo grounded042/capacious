@@ -31,6 +31,9 @@ type inviteeGateway interface {
 	// SetGuestMenuChoices sets the menu choices with the
 	// supplied choices for the supplied guest id
 	SetGuestMenuChoices(string, []entities.MenuChoice) ([]entities.MenuChoice, error)
+	// SetGuestMenuNote sets the menu note for a guest
+	// based on the supplied guest id
+	SetGuestMenuNote(string, entities.MenuNote) (entities.MenuNote, error)
 }
 
 // the invitee is a subset of the event object -
@@ -129,4 +132,17 @@ func (is inviteeService) GetInviteeFriendFromId(id string) (entities.InviteeFrie
 	}
 
 	return iFriend, nil
+}
+
+func (is inviteeService) SetGuestMenuNote(guestID string, note entities.MenuNote) (entities.MenuNote, utils.Error) {
+	// make sure that the FkGuestId is set correctly
+	note.FkGuestId = guestID
+
+	updatedNote, err := is.da.SetGuestMenuNote(guestID, note)
+
+	if err != nil {
+		return entities.MenuNote{}, utils.NewApiError(500, err.Error())
+	}
+
+	return updatedNote, nil
 }

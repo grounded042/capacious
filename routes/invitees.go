@@ -29,12 +29,22 @@ func InviteeRoutes(cl controllers.List) []Route {
 			Pattern: "/invitees/:invitee_id/relationships/menu_choices",
 			Handler: cl.Invitees.SetInviteeMenuChoices,
 		},
+		Route{
+			Method:  "post",
+			Pattern: "/invitees/:invitee_id/relationships/menu_note",
+			Handler: cl.Invitees.SetInviteeMenuNote,
+		},
 		// TODO: this might need to be moved into a better controller
 		// maybe a guest controller
 		Route{
 			Method:  "post",
 			Pattern: "/invitees/:invitee_id/relationships/friends/:friend_id/relationships/menu_choices",
 			Handler: cl.Invitees.SetGuestMenuChoices,
+		},
+		Route{
+			Method:  "post",
+			Pattern: "/invitees/:invitee_id/relationships/friends/:friend_id/relationships/menu_note",
+			Handler: cl.Invitees.SetInviteeFriendMenuNote,
 		},
 	}
 }

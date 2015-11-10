@@ -67,3 +67,11 @@ CREATE TABLE menu_choices (
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp
 );
+
+CREATE TABLE menu_notes (
+  menu_note_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
+  fk_guest_id uuid REFERENCES guests (guest_id),
+  note_body varchar(255),
+  created_at timestamp default current_timestamp,
+  updated_at timestamp default current_timestamp
+);

@@ -20,6 +20,8 @@ type InviteeStub interface {
 	CreateInviteeFriend(*entities.InviteeFriend) utils.Error
 	SetInviteeMenuChoices(string, []entities.MenuChoice) ([]entities.MenuChoice, utils.Error)
 	SetInviteeFriendMenuChoices(string, []entities.MenuChoice) ([]entities.MenuChoice, utils.Error)
+	SetInviteeMenuNote(string, entities.MenuNote) (entities.MenuNote, utils.Error)
+	SetInviteeFriendMenuNote(string, entities.MenuNote) (entities.MenuNote, utils.Error)
 }
 
 type InviteesController struct {
@@ -223,5 +225,63 @@ func (ec InviteesController) SetGuestMenuChoices(c web.C, w http.ResponseWriter,
 	} else {
 		w.WriteHeader(200)
 		json.NewEncoder(w).Encode(updatedChoices)
+	}
+}
+
+func (ec InviteesController) SetInviteeMenuNote(c web.C, w http.ResponseWriter, r *http.Request) {
+	inviteeID := c.URLParams["invitee_id"]
+	var note entities.MenuNote
+
+	rBody, ioErr := ioutil.ReadAll(r.Body)
+
+	if ioErr != nil {
+		w.WriteHeader(500)
+		fmt.Println(ioErr)
+		return
+	}
+
+	if err := json.Unmarshal(rBody, &note); err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+		return
+	}
+
+	updatedNote, err := ec.is.SetInviteeMenuNote(inviteeID, note)
+
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(updatedNote)
+	}
+}
+
+func (ec InviteesController) SetInviteeFriendMenuNote(c web.C, w http.ResponseWriter, r *http.Request) {
+	friendID := c.URLParams["friend_id"]
+	var note entities.MenuNote
+
+	rBody, ioErr := ioutil.ReadAll(r.Body)
+
+	if ioErr != nil {
+		w.WriteHeader(500)
+		fmt.Println(ioErr)
+		return
+	}
+
+	if err := json.Unmarshal(rBody, &note); err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+		return
+	}
+
+	updatedNote, err := ec.is.SetInviteeFriendMenuNote(friendID, note)
+
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(updatedNote)
 	}
 }

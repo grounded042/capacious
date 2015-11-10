@@ -111,6 +111,30 @@ func (c Coordinator) SetGuestMenuChoices(eventID string, guestID string, choices
 	return c.invitees.SetGuestMenuChoices(guestID, choices)
 }
 
+func (c Coordinator) SetInviteeMenuNote(inviteeID string, note entities.MenuNote) (entities.MenuNote, utils.Error) {
+	invitee, err := c.invitees.GetInviteeFromId(inviteeID)
+
+	if err != nil {
+		return entities.MenuNote{}, err
+	}
+
+	return c.SetGuestMenuNote(invitee.FkGuestId, note)
+}
+
+func (c Coordinator) SetInviteeFriendMenuNote(iFriendID string, note entities.MenuNote) (entities.MenuNote, utils.Error) {
+	iFriend, err := c.invitees.GetInviteeFriendFromId(iFriendID)
+
+	if err != nil {
+		return entities.MenuNote{}, err
+	}
+
+	return c.SetGuestMenuNote(iFriend.FkGuestId, note)
+}
+
+func (c Coordinator) SetGuestMenuNote(guestID string, note entities.MenuNote) (entities.MenuNote, utils.Error) {
+	return c.invitees.SetGuestMenuNote(guestID, note)
+}
+
 // validateMenuChoicesWithMenuItems validates that the supplied choices match
 // up with the supplied menu items. It returns a bool regarding the validity.
 // TODO: unit test this sucker

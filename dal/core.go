@@ -126,10 +126,13 @@ func (dh DataHandler) addInviteeFriendsToInvitee(invitee entities.Invitee) (enti
 
 func (dh DataHandler) GetInviteeFriendsFromInviteeId(id string) ([]entities.InviteeFriend, error) {
 	var inviteeFriends []entities.InviteeFriend
+	var count int
 
-	db := dh.conn.Debug().Table("invitee_friends").Where("fk_invitee_id = ?", id).Find(&inviteeFriends)
+	db := dh.conn.Debug().Table("invitee_friends").Where("fk_invitee_id = ?", id).Find(&inviteeFriends).Count(&count)
 
-	if db.Error != nil {
+	if count == 0 {
+		return []entities.InviteeFriend{}, nil
+	} else if db.Error != nil {
 		return []entities.InviteeFriend{}, db.Error
 	}
 
@@ -233,6 +236,18 @@ func (dh DataHandler) getGuestFromId(id string) (entities.Guest, error) {
 
 	guest.MenuChoices, err = dh.getMenuChoicesForGuestID(guest.GuestId)
 
+	if err != nil {
+		return entities.Guest{}, err
+	}
+
+	note, err := dh.getMenuNoteForGuestID(guest.GuestId)
+
+	if err != nil {
+		return entities.Guest{}, err
+	}
+
+	guest.MenuNote = note.NoteBody
+
 	return guest, err
 }
 
@@ -240,8 +255,13 @@ func (dh DataHandler) getGuestFromId(id string) (entities.Guest, error) {
 // It returns a slice of entities.MenuChoice objs and any error that occured.
 func (dh DataHandler) getMenuChoicesForGuestID(guestID string) ([]entities.MenuChoice, error) {
 	var choices []entities.MenuChoice
+	var count int
 
-	db := dh.conn.Debug().Where("fk_guest_id = ?", guestID).Find(&choices)
+	db := dh.conn.Debug().Where("fk_guest_id = ?", guestID).Find(&choices).Count(&count)
+
+	if count == 0 {
+		return []entities.MenuChoice{}, nil
+	}
 
 	return choices, db.Error
 }
@@ -313,10 +333,13 @@ func (dh DataHandler) UpdateInviteeFriend(updateMe entities.InviteeFriend) error
 
 func (dh DataHandler) GetInviteeFriendFromId(id string) (entities.InviteeFriend, error) {
 	var friend entities.InviteeFriend
+	var count int
 
-	db := dh.conn.Debug().Where("invitee_friend_id = ?", id).First(&friend)
+	db := dh.conn.Debug().Where("invitee_friend_id = ?", id).First(&friend).Count(&count)
 
-	if db.Error != nil {
+	if count == 0 {
+		return entities.InviteeFriend{}, nil
+	} else if db.Error != nil {
 		return entities.InviteeFriend{}, db.Error
 	}
 
@@ -330,10 +353,13 @@ func (dh DataHandler) GetInviteeFriendFromId(id string) (entities.InviteeFriend,
 // occured.
 func (dh DataHandler) GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, error) {
 	var items = []entities.MenuItem{}
+	var count int
 
-	db := dh.conn.Where("fk_event_id = ?", eventID).Find(&items)
+	db := dh.conn.Where("fk_event_id = ?", eventID).Find(&items).Count(&count)
 
-	if db.Error != nil {
+	if count == 0 {
+		return []entities.MenuItem{}, nil
+	} else if db.Error != nil {
 		return []entities.MenuItem{}, db.Error
 	}
 
@@ -378,8 +404,13 @@ func (dh DataHandler) addMenuItemOptionToMenuItem(item entities.MenuItem) (entit
 // and any error that occured.
 func (dh DataHandler) getMenuItemOptionsForMenuItemID(menuItemID string) ([]entities.MenuItemOption, error) {
 	var opts []entities.MenuItemOption
+	var count int
 
-	db := dh.conn.Debug().Table("menu_item_options").Where("fk_menu_item_id = ?", menuItemID).Find(&opts)
+	db := dh.conn.Debug().Table("menu_item_options").Where("fk_menu_item_id = ?", menuItemID).Find(&opts).Count(&count)
+
+	if count == 0 {
+		return []entities.MenuItemOption{}, nil
+	}
 
 	return opts, db.Error
 }
@@ -415,4 +446,43 @@ func (dh DataHandler) SetGuestMenuChoices(guestID string, choices []entities.Men
 	}
 
 	return choices, nil
+}
+
+func (dh DataHandler) SetGuestMenuNote(guestID string, note entities.MenuNote) (entities.MenuNote, error) {
+	// delete the current note
+	oldNote, err := dh.getMenuNoteForGuestID(guestID)
+
+	if err != nil {
+		return entities.MenuNote{}, err
+	}
+
+	if oldNote.MenuNoteId != "" {
+		db := dh.conn.Debug().Delete(oldNote)
+
+		if db.Error != nil {
+			return entities.MenuNote{}, db.Error
+		}
+	}
+
+	// add the new note
+	db := dh.conn.Debug().Create(&note)
+
+	if db.Error != nil {
+		return entities.MenuNote{}, db.Error
+	}
+
+	return note, nil
+}
+
+func (dh DataHandler) getMenuNoteForGuestID(guestID string) (entities.MenuNote, error) {
+	var note entities.MenuNote
+	var count int
+
+	db := dh.conn.Debug().Where("fk_guest_id = ?", guestID).Find(&note).Count(&count)
+
+	if count == 0 {
+		return entities.MenuNote{}, nil
+	}
+
+	return note, db.Error
 }
