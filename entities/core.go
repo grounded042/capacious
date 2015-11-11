@@ -80,3 +80,13 @@ type MenuNote struct {
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }
+
+type InviteeSeatingRequest struct {
+	InviteeSeatingRequestId string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"invitee_seating_request_id"`
+	FkInviteeId             string    `json:"-"`
+	FkInviteeRequestId      string    `json:"invitee_request_id"`
+	FirstName               string    `sql:"-" json:"first_name"`
+	LastName                string    `sql:"-" json:"last_name"`
+	CreatedAt               time.Time `json:"created_at"`
+	UpdatedAt               time.Time `json:"updated_at"`
+}
