@@ -90,3 +90,9 @@ type InviteeSeatingRequest struct {
 	CreatedAt               time.Time `json:"created_at"`
 	UpdatedAt               time.Time `json:"updated_at"`
 }
+
+type SeatingRequestChoice struct {
+	FkInviteeRequestId string `json:"invitee_request_id"`
+	FirstName          string `json:"first_name"`
+	LastName           string `json:"last_name"`
+}

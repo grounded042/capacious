@@ -1,10 +1,19 @@
 package services
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"fmt"
+	"os"
+
 	"github.com/grounded042/capacious/dal"
 	"github.com/grounded042/capacious/entities"
 	"github.com/grounded042/capacious/utils"
 )
+
+// commonIV for data encryption
+var commonIV = []byte{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f}
+var key = os.Getenv("ENC_KEY")
 
 // the Coordinator coordinates interactions between different services.
 // it applies any overarching business logic relates to more than one service.
@@ -39,6 +48,56 @@ func (c Coordinator) CreateEvent(event *entities.Event) utils.Error {
 
 func (c Coordinator) GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, utils.Error) {
 	return c.events.GetMenuItemsForEvent(eventID)
+}
+
+func (c Coordinator) GetListOfSeatingRequestChoices(eventID string) ([]entities.SeatingRequestChoice, utils.Error) {
+	iList, err := c.invitees.GetInviteesForEvent(eventID)
+
+	if err != nil {
+		return []entities.SeatingRequestChoice{}, utils.NewApiError(500, err.Error())
+	}
+
+	return c.encryptInviteesToSeatingRequestChoiceList(iList)
+}
+
+func (c Coordinator) encryptInviteesToSeatingRequestChoiceList(iList []entities.Invitee) ([]entities.SeatingRequestChoice, utils.Error) {
+	var srcl []entities.SeatingRequestChoice
+
+	for _, value := range iList {
+		src := entities.SeatingRequestChoice{
+			FkInviteeRequestId: value.InviteeId,
+			FirstName:          value.Self.FirstName,
+			LastName:           value.Self.LastName,
+		}
+
+		eSrc, err := c.encryptSeatingRequestChoice(src)
+
+		if err != nil {
+			return []entities.SeatingRequestChoice{}, utils.NewApiError(500, err.Error())
+		}
+
+		srcl = append(srcl, eSrc)
+	}
+
+	return srcl, nil
+}
+
+func (c Coordinator) encryptSeatingRequestChoice(choice entities.SeatingRequestChoice) (entities.SeatingRequestChoice, utils.Error) {
+	// get the id as a byte
+	toEncrypt := []byte(choice.FkInviteeRequestId)
+
+	newCipher, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return entities.SeatingRequestChoice{}, utils.NewApiError(500, err.Error())
+	}
+
+	cfb := cipher.NewCFBEncrypter(newCipher, commonIV)
+	ciphertext := make([]byte, len(toEncrypt))
+	cfb.XORKeyStream(ciphertext, toEncrypt)
+
+	choice.FkInviteeRequestId = fmt.Sprintf("%x", ciphertext)
+
+	return choice, nil
 }
 
 // end events coordination

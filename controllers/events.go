@@ -16,6 +16,7 @@ type EventsStub interface {
 	GetEventInfo(eventId string) (entities.Event, utils.Error)
 	CreateEvent(*entities.Event) utils.Error
 	GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, utils.Error)
+	GetListOfSeatingRequestChoices(eventID string) ([]entities.SeatingRequestChoice, utils.Error)
 }
 
 type EventsController struct {
@@ -84,5 +85,15 @@ func (ec EventsController) GetMenuItemsForEvent(c web.C, w http.ResponseWriter, 
 	} else {
 		w.WriteHeader(200)
 		json.NewEncoder(w).Encode(items)
+	}
+}
+
+func (ec EventsController) GetListOfSeatingRequestChoices(c web.C, w http.ResponseWriter, r *http.Request) {
+	if choices, err := ec.es.GetListOfSeatingRequestChoices(c.URLParams["id"]); err != nil {
+		w.WriteHeader(500)
+		fmt.Println(err)
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(choices)
 	}
 }
