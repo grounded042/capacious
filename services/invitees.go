@@ -34,6 +34,9 @@ type inviteeGateway interface {
 	// SetGuestMenuNote sets the menu note for a guest
 	// based on the supplied guest id
 	SetGuestMenuNote(string, entities.MenuNote) (entities.MenuNote, error)
+	// SetInviteeSeatingRequests sets the invitee seating requests for an invitee
+	// based on the suppllied invitee id
+	SetInviteeSeatingRequests(string, []entities.InviteeSeatingRequest) ([]entities.InviteeSeatingRequest, error)
 }
 
 // the invitee is a subset of the event object -
@@ -145,4 +148,24 @@ func (is inviteeService) SetGuestMenuNote(guestID string, note entities.MenuNote
 	}
 
 	return updatedNote, nil
+}
+
+func (is inviteeService) SetInviteeSeatingRequests(inviteeID string, requests []entities.InviteeSeatingRequest) ([]entities.InviteeSeatingRequest, utils.Error) {
+	// make sure that the FkGuestId is set correctly
+	for i := len(requests) - 1; i >= 0; i-- {
+		requests[i].FkInviteeId = inviteeID
+
+		// make sure someone is not setting themselves to be a friend
+		if requests[i].FkInviteeRequestId == inviteeID {
+			requests = append(requests[:i], requests[i+1:]...)
+		}
+	}
+
+	toReturn, err := is.da.SetInviteeSeatingRequests(inviteeID, requests)
+
+	if err != nil {
+		return []entities.InviteeSeatingRequest{}, utils.NewApiError(500, err.Error())
+	}
+
+	return toReturn, nil
 }

@@ -69,12 +69,32 @@ func (dh DataHandler) GetAllInviteesForEvent(eventId string) ([]entities.Invitee
 		return []entities.Invitee{}, db.Error
 	}
 
+	invitees, db.Error = dh.addInviteeSeatingRequestsToInvitees(invitees)
+
+	if db.Error != nil {
+		return []entities.Invitee{}, db.Error
+	}
+
 	return dh.addInviteeFriendsToInvitees(invitees)
 }
 
 func (dh DataHandler) addInviteeSelfToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
 	for key, value := range list {
 		invitee, err := dh.addInviteeSelfToInvitee(value)
+
+		if err != nil {
+			return []entities.Invitee{}, err
+		}
+
+		list[key] = invitee
+	}
+
+	return list, nil
+}
+
+func (dh DataHandler) addInviteeSeatingRequestsToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
+	for key, value := range list {
+		invitee, err := dh.addInviteeSeatingRequestsToInvitee(value)
 
 		if err != nil {
 			return []entities.Invitee{}, err
@@ -93,6 +113,30 @@ func (dh DataHandler) addInviteeSelfToInvitee(invitee entities.Invitee) (entitie
 
 	if err != nil {
 		return entities.Invitee{}, err
+	}
+
+	return invitee, nil
+}
+
+func (dh DataHandler) addInviteeSeatingRequestsToInvitee(invitee entities.Invitee) (entities.Invitee, error) {
+	var err error
+
+	invitee.SeatingRequests, err = dh.getInviteeSeatingRequestsForInviteeID(invitee.InviteeId)
+
+	if err != nil {
+		return entities.Invitee{}, err
+	}
+
+	// add the first and last names
+	for key, value := range invitee.SeatingRequests {
+		firstName, lastName, err := dh.getInviteeFirstNameAndLastNameFromId(value.FkInviteeRequestId)
+
+		if err != nil {
+			return entities.Invitee{}, err
+		}
+
+		invitee.SeatingRequests[key].FirstName = firstName
+		invitee.SeatingRequests[key].LastName = lastName
 	}
 
 	return invitee, nil
@@ -220,7 +264,31 @@ func (dh DataHandler) GetInviteeFromId(id string) (entities.Invitee, error) {
 		return entities.Invitee{}, db.Error
 	}
 
+	invitee, db.Error = dh.addInviteeSeatingRequestsToInvitee(invitee)
+
+	if db.Error != nil {
+		return entities.Invitee{}, db.Error
+	}
+
 	return dh.addInviteeFriendsToInvitee(invitee)
+}
+
+func (dh DataHandler) getInviteeFirstNameAndLastNameFromId(id string) (string, string, error) {
+	var invitee entities.Invitee
+
+	db := dh.conn.Debug().Where("invitee_id = ?", id).First(&invitee)
+
+	if db.Error != nil {
+		return "", "", db.Error
+	}
+
+	invitee, db.Error = dh.addInviteeSelfToInvitee(invitee)
+
+	if db.Error != nil {
+		return "", "", db.Error
+	}
+
+	return invitee.Self.FirstName, invitee.Self.LastName, nil
 }
 
 func (dh DataHandler) getGuestFromId(id string) (entities.Guest, error) {
@@ -485,4 +553,49 @@ func (dh DataHandler) getMenuNoteForGuestID(guestID string) (entities.MenuNote, 
 	}
 
 	return note, db.Error
+}
+
+func (dh DataHandler) getInviteeSeatingRequestsForInviteeID(inviteeID string) ([]entities.InviteeSeatingRequest, error) {
+	var requests []entities.InviteeSeatingRequest
+	var count int
+
+	db := dh.conn.Debug().Where("fk_invitee_id = ?", inviteeID).Find(&requests).Count(&count)
+
+	if count == 0 {
+		return []entities.InviteeSeatingRequest{}, nil
+	}
+
+	return requests, db.Error
+}
+
+func (dh DataHandler) SetInviteeSeatingRequests(inviteeID string, requests []entities.InviteeSeatingRequest) ([]entities.InviteeSeatingRequest, error) {
+	// delete all the current requests
+	oldRequests, err := dh.getInviteeSeatingRequestsForInviteeID(inviteeID)
+
+	if err != nil {
+		return []entities.InviteeSeatingRequest{}, err
+	}
+
+	if len(oldRequests) > 0 {
+		for _, value := range oldRequests {
+			db := dh.conn.Debug().Delete(value)
+
+			if db.Error != nil {
+				return []entities.InviteeSeatingRequest{}, db.Error
+			}
+		}
+	}
+
+	// add the new requests
+	for key, value := range requests {
+		db := dh.conn.Debug().Create(&value)
+
+		if db.Error != nil {
+			return []entities.InviteeSeatingRequest{}, db.Error
+		}
+
+		requests[key] = value
+	}
+
+	return requests, nil
 }

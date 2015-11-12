@@ -3,7 +3,7 @@ package services
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"fmt"
+	"encoding/base64"
 	"os"
 
 	"github.com/grounded042/capacious/dal"
@@ -83,21 +83,33 @@ func (c Coordinator) encryptInviteesToSeatingRequestChoiceList(iList []entities.
 }
 
 func (c Coordinator) encryptSeatingRequestChoice(choice entities.SeatingRequestChoice) (entities.SeatingRequestChoice, utils.Error) {
-	// get the id as a byte
-	toEncrypt := []byte(choice.FkInviteeRequestId)
+	var err error
 
-	newCipher, err := aes.NewCipher([]byte(key))
+	choice.FkInviteeRequestId, err = c.encryptFkInviteeRequestId(choice.FkInviteeRequestId)
+
 	if err != nil {
 		return entities.SeatingRequestChoice{}, utils.NewApiError(500, err.Error())
 	}
 
-	cfb := cipher.NewCFBEncrypter(newCipher, commonIV)
-	ciphertext := make([]byte, len(toEncrypt))
-	cfb.XORKeyStream(ciphertext, toEncrypt)
-
-	choice.FkInviteeRequestId = fmt.Sprintf("%x", ciphertext)
-
 	return choice, nil
+}
+
+func (c Coordinator) encryptFkInviteeRequestId(toEncrypt string) (string, utils.Error) {
+	teByte := []byte(toEncrypt)
+
+	newCipher, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return "", utils.NewApiError(500, err.Error())
+	}
+
+	cfb := cipher.NewCFBEncrypter(newCipher, commonIV)
+	ciphertext := make([]byte, len(teByte))
+	cfb.XORKeyStream(ciphertext, teByte)
+
+	base64Text := make([]byte, base64.StdEncoding.EncodedLen(len(ciphertext)))
+	base64.StdEncoding.Encode(base64Text, []byte(ciphertext))
+
+	return string(base64Text), nil
 }
 
 // end events coordination
@@ -194,6 +206,30 @@ func (c Coordinator) SetGuestMenuNote(guestID string, note entities.MenuNote) (e
 	return c.invitees.SetGuestMenuNote(guestID, note)
 }
 
+func (c Coordinator) SetInviteeSeatingRequests(inviteeID string, requests []entities.InviteeSeatingRequest) ([]entities.InviteeSeatingRequest, utils.Error) {
+	requests, err := c.decryptInviteeSeatingRequests(requests)
+
+	if err != nil {
+		return []entities.InviteeSeatingRequest{}, err
+	}
+
+	requests, err = c.invitees.SetInviteeSeatingRequests(inviteeID, requests)
+
+	if err != nil {
+		return []entities.InviteeSeatingRequest{}, err
+	}
+
+	for key, value := range requests {
+		requests[key].FkInviteeRequestId, err = c.encryptFkInviteeRequestId(value.FkInviteeRequestId)
+
+		if err != nil {
+			return []entities.InviteeSeatingRequest{}, err
+		}
+	}
+
+	return requests, nil
+}
+
 // validateMenuChoicesWithMenuItems validates that the supplied choices match
 // up with the supplied menu items. It returns a bool regarding the validity.
 // TODO: unit test this sucker
@@ -231,6 +267,39 @@ func (c Coordinator) validateMenuChoicesWithMenuItems(choices []entities.MenuCho
 
 	// if we made it this far, we are good!
 	return true
+}
+
+func (c Coordinator) decryptInviteeSeatingRequests(requests []entities.InviteeSeatingRequest) ([]entities.InviteeSeatingRequest, utils.Error) {
+	for key, value := range requests {
+		newValue, err := c.decryptInviteeSeatingRequest(value)
+
+		if err != nil {
+			return []entities.InviteeSeatingRequest{}, err
+		}
+
+		requests[key] = newValue
+	}
+
+	return requests, nil
+}
+
+func (c Coordinator) decryptInviteeSeatingRequest(request entities.InviteeSeatingRequest) (entities.InviteeSeatingRequest, utils.Error) {
+	dbuf := make([]byte, base64.StdEncoding.DecodedLen(len(request.FkInviteeRequestId)))
+	base64.StdEncoding.Decode(dbuf, []byte(request.FkInviteeRequestId))
+	toDecrypt := []byte(dbuf)
+
+	newCipher, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return entities.InviteeSeatingRequest{}, utils.NewApiError(500, err.Error())
+	}
+
+	cfbdec := cipher.NewCFBDecrypter(newCipher, commonIV)
+	decrypted := make([]byte, len(toDecrypt))
+	cfbdec.XORKeyStream(decrypted, toDecrypt)
+
+	request.FkInviteeRequestId = string(decrypted)
+
+	return request, nil
 }
 
 //end invitee coordination

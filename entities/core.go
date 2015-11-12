@@ -20,20 +20,21 @@ type Guest struct {
 	LastName    string       `json:"last_name"`
 	Attending   bool         `json:"attending"`
 	MenuChoices []MenuChoice `json:"menu_choices"`
-	MenuNote    string       `json:"menu_note"`
+	MenuNote    string       `sql:"-" json:"menu_note"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 }
 
 type Invitee struct {
-	InviteeId string          `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"invitee_id"`
-	FkEventId string          `json:"-"`
-	FkGuestId string          `json:"-"`
-	Email     string          `json:"email"`
-	Self      Guest           `json:"self"`
-	Friends   []InviteeFriend `json:"friends"`
-	CreatedAt time.Time       `json:"created_at"`
-	UpdatedAt time.Time       `json:"updated_at"`
+	InviteeId       string                  `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"invitee_id"`
+	FkEventId       string                  `json:"-"`
+	FkGuestId       string                  `json:"-"`
+	Email           string                  `json:"email"`
+	Self            Guest                   `json:"self"`
+	Friends         []InviteeFriend         `json:"friends"`
+	SeatingRequests []InviteeSeatingRequest `json:"seating_request"`
+	CreatedAt       time.Time               `json:"created_at"`
+	UpdatedAt       time.Time               `json:"updated_at"`
 }
 
 type InviteeFriend struct {

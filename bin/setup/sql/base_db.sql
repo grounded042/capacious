@@ -79,7 +79,7 @@ CREATE TABLE menu_notes (
 CREATE TABLE invitee_seating_requests (
   invitee_seating_request_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
   fk_invitee_id uuid REFERENCES invitees (invitee_id),
-  fk_invitee_request uuid REFERENCES invitees (invitee_id),
+  fk_invitee_request_id uuid REFERENCES invitees (invitee_id),
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp
 );
