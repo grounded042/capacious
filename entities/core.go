@@ -69,6 +69,7 @@ type MenuItemOption struct {
 type MenuChoice struct {
 	MenuChoiceId       string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"menu_choice_id"`
 	FkGuestId          string    `json:"-"`
+	FkMenuItemId       string    `json:"menu_item_id"`
 	FkMenuItemOptionId string    `json:"menu_item_option_id"`
 	CreatedAt          time.Time `json:"created_at"`
 	UpdatedAt          time.Time `json:"updated_at"`

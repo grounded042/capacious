@@ -63,6 +63,7 @@ CREATE TABLE menu_item_options (
 CREATE TABLE menu_choices (
   menu_choice_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
   fk_guest_id uuid REFERENCES guests (guest_id),
+  fk_menu_item_id uuid REFERENCES menu_items (menu_item_id),
   fk_menu_item_option_id uuid REFERENCES menu_item_options (menu_item_option_id),
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp
