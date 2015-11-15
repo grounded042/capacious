@@ -37,6 +37,9 @@ type inviteeGateway interface {
 	// SetInviteeSeatingRequests sets the invitee seating requests for an invitee
 	// based on the suppllied invitee id
 	SetInviteeSeatingRequests(string, []entities.InviteeSeatingRequest) ([]entities.InviteeSeatingRequest, error)
+	// GetSeatingRequestInviteesForEvent gets a list of invitees that only includes the needed info for
+	// seating requests
+	GetSeatingRequestInviteesForEvent(string) ([]entities.Invitee, error)
 }
 
 // the invitee is a subset of the event object -
@@ -165,6 +168,16 @@ func (is inviteeService) SetInviteeSeatingRequests(inviteeID string, requests []
 
 	if err != nil {
 		return []entities.InviteeSeatingRequest{}, utils.NewApiError(500, err.Error())
+	}
+
+	return toReturn, nil
+}
+
+func (is inviteeService) GetSeatingRequestInviteesForEvent(eventID string) ([]entities.Invitee, utils.Error) {
+	toReturn, err := is.da.GetSeatingRequestInviteesForEvent(eventID)
+
+	if err != nil {
+		return []entities.Invitee{}, utils.NewApiError(500, err.Error())
 	}
 
 	return toReturn, nil

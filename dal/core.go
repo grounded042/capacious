@@ -599,3 +599,34 @@ func (dh DataHandler) SetInviteeSeatingRequests(inviteeID string, requests []ent
 
 	return requests, nil
 }
+
+type getInviteesForRequest struct {
+	InviteeID string
+	FirstName string
+	LastName  string
+}
+
+func (dh DataHandler) GetSeatingRequestInviteesForEvent(eventID string) ([]entities.Invitee, error) {
+	var getStuff []getInviteesForRequest
+	invitees := []entities.Invitee{}
+
+	db := dh.conn.Debug().Table("invitees").Select("invitees.invitee_id, guests.first_name, guests.last_name").Joins("left join guests on guests.guest_id = invitees.fk_guest_id").Where("invitees.fk_event_id = ?", eventID).Scan(&getStuff)
+
+	if db.Error != nil {
+		return []entities.Invitee{}, db.Error
+	}
+
+	for _, value := range getStuff {
+		invitee := entities.Invitee{
+			InviteeId: value.InviteeID,
+			Self: entities.Guest{
+				FirstName: value.FirstName,
+				LastName:  value.LastName,
+			},
+		}
+
+		invitees = append(invitees, invitee)
+	}
+
+	return invitees, nil
+}

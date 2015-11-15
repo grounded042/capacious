@@ -51,7 +51,7 @@ func (c Coordinator) GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, 
 }
 
 func (c Coordinator) GetListOfSeatingRequestChoices(eventID string) ([]entities.SeatingRequestChoice, utils.Error) {
-	iList, err := c.invitees.GetInviteesForEvent(eventID)
+	iList, err := c.invitees.GetSeatingRequestInviteesForEvent(eventID)
 
 	if err != nil {
 		return []entities.SeatingRequestChoice{}, utils.NewApiError(500, err.Error())
