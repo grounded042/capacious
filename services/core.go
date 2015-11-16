@@ -125,7 +125,21 @@ func (c Coordinator) CreateInviteeForEvent(invitee *entities.Invitee, event enti
 }
 
 func (c Coordinator) GetInviteeFromId(id string) (entities.Invitee, utils.Error) {
-	return c.invitees.GetInviteeFromId(id)
+	invitee, err := c.invitees.GetInviteeFromId(id)
+
+	if err != nil {
+		return entities.Invitee{}, err
+	}
+
+	for key, value := range invitee.SeatingRequests {
+		invitee.SeatingRequests[key].FkInviteeRequestId, err = c.encryptFkInviteeRequestId(value.FkInviteeRequestId)
+
+		if err != nil {
+			return entities.Invitee{}, err
+		}
+	}
+
+	return invitee, nil
 }
 
 func (c Coordinator) EditInvitee(updateMe entities.Invitee) utils.Error {
