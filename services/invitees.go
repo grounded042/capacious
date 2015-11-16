@@ -161,6 +161,10 @@ func (is inviteeService) SetInviteeSeatingRequests(inviteeID string, requests []
 		// make sure someone is not setting themselves to be a friend
 		if requests[i].FkInviteeRequestId == inviteeID {
 			requests = append(requests[:i], requests[i+1:]...)
+		} else {
+			// clear any existing primary keys - remember, we are replacing, not
+			// updating
+			requests[i].InviteeSeatingRequestId = ""
 		}
 	}
 
