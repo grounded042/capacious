@@ -9,11 +9,11 @@ BEGIN
 
     -- create a test event
     INSERT INTO events(event_id, name, description, location,
-        start_time, end_time, allowed_friends, created_at, updated_at)
+        start_time, end_time, respond_by, allowed_friends, created_at, updated_at)
     VALUES (
       'cd7bc650-2e71-11e5-a390-675459d99309', 'Picnic', 'Your normal picnic.', 'The Park',
-      '2015-12-15 17:00:00.000000', '2015-12-15 22:00:00.000000', 2, '2015-07-11 22:36:31.024391',
-      '2015-07-11 22:36:31.024391'
+      '2015-12-15 17:00:00.000000', '2015-12-15 22:00:00.000000', '2015-12-05 22:00:00.000000',
+      2, '2015-07-11 22:36:31.024391', '2015-07-11 22:36:31.024391'
     );
 
     -- create menu options for the test event

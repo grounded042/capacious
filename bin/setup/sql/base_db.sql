@@ -9,6 +9,7 @@ CREATE TABLE events (
   location varchar(255) NOT NULL,
   start_time timestamp,
   end_time timestamp,
+  respond_by timestamp,
   allowed_friends int,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp
