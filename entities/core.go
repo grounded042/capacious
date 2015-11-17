@@ -9,7 +9,7 @@ type Event struct {
 	Location      string    `json:"location"`
 	StartTime     time.Time `json:"start_time"`
 	EndTime       time.Time `json:"end_time"`
-	RespondBy     time.Time `json:respond_by`
+	RespondBy     time.Time `json:"respond_by"`
 	AllowedGuests int       `json:"allowed_guests"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
