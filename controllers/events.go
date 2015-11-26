@@ -72,7 +72,7 @@ func (ec EventsController) CreateEvent(c web.C, w http.ResponseWriter, r *http.R
 		w.WriteHeader(500)
 		fmt.Println(err)
 	} else {
-		w.WriteHeader(200)
+		w.WriteHeader(201)
 		json.NewEncoder(w).Encode(event)
 	}
 }
