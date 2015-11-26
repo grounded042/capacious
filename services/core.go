@@ -65,7 +65,7 @@ func (c Coordinator) encryptInviteesToSeatingRequestChoiceList(iList []entities.
 
 	for _, value := range iList {
 		src := entities.SeatingRequestChoice{
-			FkInviteeRequestId: value.InviteeId,
+			FkInviteeRequestID: value.InviteeID,
 			FirstName:          value.Self.FirstName,
 			LastName:           value.Self.LastName,
 		}
@@ -85,7 +85,7 @@ func (c Coordinator) encryptInviteesToSeatingRequestChoiceList(iList []entities.
 func (c Coordinator) encryptSeatingRequestChoice(choice entities.SeatingRequestChoice) (entities.SeatingRequestChoice, utils.Error) {
 	var err error
 
-	choice.FkInviteeRequestId, err = c.encryptFkInviteeRequestId(choice.FkInviteeRequestId)
+	choice.FkInviteeRequestID, err = c.encryptFkInviteeRequestID(choice.FkInviteeRequestID)
 
 	if err != nil {
 		return entities.SeatingRequestChoice{}, utils.NewApiError(500, err.Error())
@@ -94,7 +94,7 @@ func (c Coordinator) encryptSeatingRequestChoice(choice entities.SeatingRequestC
 	return choice, nil
 }
 
-func (c Coordinator) encryptFkInviteeRequestId(toEncrypt string) (string, utils.Error) {
+func (c Coordinator) encryptFkInviteeRequestID(toEncrypt string) (string, utils.Error) {
 	teByte := []byte(toEncrypt)
 
 	newCipher, err := aes.NewCipher([]byte(key))
@@ -124,15 +124,15 @@ func (c Coordinator) CreateInviteeForEvent(invitee *entities.Invitee, event enti
 	return c.invitees.CreateInviteeForEvent(invitee, event)
 }
 
-func (c Coordinator) GetInviteeFromId(id string) (entities.Invitee, utils.Error) {
-	invitee, err := c.invitees.GetInviteeFromId(id)
+func (c Coordinator) GetInviteeFromID(id string) (entities.Invitee, utils.Error) {
+	invitee, err := c.invitees.GetInviteeFromID(id)
 
 	if err != nil {
 		return entities.Invitee{}, err
 	}
 
 	for key, value := range invitee.SeatingRequests {
-		invitee.SeatingRequests[key].FkInviteeRequestId, err = c.encryptFkInviteeRequestId(value.FkInviteeRequestId)
+		invitee.SeatingRequests[key].FkInviteeRequestID, err = c.encryptFkInviteeRequestID(value.FkInviteeRequestID)
 
 		if err != nil {
 			return entities.Invitee{}, err
@@ -157,29 +157,29 @@ func (c Coordinator) EditInviteeFriend(updateMe entities.InviteeFriend) utils.Er
 }
 
 func (c Coordinator) SetInviteeMenuChoices(inviteeID string, choices []entities.MenuChoice) ([]entities.MenuChoice, utils.Error) {
-	invitee, err := c.invitees.GetInviteeFromId(inviteeID)
+	invitee, err := c.invitees.GetInviteeFromID(inviteeID)
 
 	if err != nil {
 		return []entities.MenuChoice{}, err
 	}
 
-	return c.SetGuestMenuChoices(invitee.FkEventId, invitee.Self.GuestId, choices)
+	return c.SetGuestMenuChoices(invitee.FkEventID, invitee.Self.GuestID, choices)
 }
 
 func (c Coordinator) SetInviteeFriendMenuChoices(iFriendID string, choices []entities.MenuChoice) ([]entities.MenuChoice, utils.Error) {
-	iFriend, err := c.invitees.GetInviteeFriendFromId(iFriendID)
+	iFriend, err := c.invitees.GetInviteeFriendFromID(iFriendID)
 
 	if err != nil {
 		return []entities.MenuChoice{}, err
 	}
 
-	invitee, err := c.invitees.GetInviteeFromId(iFriend.FkInviteeId)
+	invitee, err := c.invitees.GetInviteeFromID(iFriend.FkInviteeID)
 
 	if err != nil {
 		return []entities.MenuChoice{}, err
 	}
 
-	return c.SetGuestMenuChoices(invitee.FkEventId, iFriend.FkGuestId, choices)
+	return c.SetGuestMenuChoices(invitee.FkEventID, iFriend.FkGuestID, choices)
 }
 
 func (c Coordinator) SetGuestMenuChoices(eventID string, guestID string, choices []entities.MenuChoice) ([]entities.MenuChoice, utils.Error) {
@@ -197,23 +197,23 @@ func (c Coordinator) SetGuestMenuChoices(eventID string, guestID string, choices
 }
 
 func (c Coordinator) SetInviteeMenuNote(inviteeID string, note entities.MenuNote) (entities.MenuNote, utils.Error) {
-	invitee, err := c.invitees.GetInviteeFromId(inviteeID)
+	invitee, err := c.invitees.GetInviteeFromID(inviteeID)
 
 	if err != nil {
 		return entities.MenuNote{}, err
 	}
 
-	return c.SetGuestMenuNote(invitee.FkGuestId, note)
+	return c.SetGuestMenuNote(invitee.FkGuestID, note)
 }
 
 func (c Coordinator) SetInviteeFriendMenuNote(iFriendID string, note entities.MenuNote) (entities.MenuNote, utils.Error) {
-	iFriend, err := c.invitees.GetInviteeFriendFromId(iFriendID)
+	iFriend, err := c.invitees.GetInviteeFriendFromID(iFriendID)
 
 	if err != nil {
 		return entities.MenuNote{}, err
 	}
 
-	return c.SetGuestMenuNote(iFriend.FkGuestId, note)
+	return c.SetGuestMenuNote(iFriend.FkGuestID, note)
 }
 
 func (c Coordinator) SetGuestMenuNote(guestID string, note entities.MenuNote) (entities.MenuNote, utils.Error) {
@@ -234,7 +234,7 @@ func (c Coordinator) SetInviteeSeatingRequests(inviteeID string, requests []enti
 	}
 
 	for key, value := range requests {
-		requests[key].FkInviteeRequestId, err = c.encryptFkInviteeRequestId(value.FkInviteeRequestId)
+		requests[key].FkInviteeRequestID, err = c.encryptFkInviteeRequestID(value.FkInviteeRequestID)
 
 		if err != nil {
 			return []entities.InviteeSeatingRequest{}, err
@@ -255,16 +255,16 @@ func (c Coordinator) validateMenuChoicesWithMenuItems(choices []entities.MenuCho
 		// what item does the current choice align to?
 		for _, iValue := range items {
 			for _, oValue := range iValue.Options {
-				if oValue.MenuItemOptionId == cValue.FkMenuItemOptionId {
+				if oValue.MenuItemOptionID == cValue.FkMenuItemOptionID {
 					// we found an item option that matches the choice id,
 					// so we have validated that the choice is valid
 					itemMatch = true
 
 					// up the count for the number of times a choice has been used for an item
-					itemUsage[iValue.MenuItemId] = itemUsage[iValue.MenuItemId] + 1
+					itemUsage[iValue.MenuItemID] = itemUsage[iValue.MenuItemID] + 1
 
 					// is the number of choices higher than the number of choices allowed?
-					if itemUsage[iValue.MenuItemId] > iValue.NumChoices {
+					if itemUsage[iValue.MenuItemID] > iValue.NumChoices {
 						return false
 					}
 
@@ -298,8 +298,8 @@ func (c Coordinator) decryptInviteeSeatingRequests(requests []entities.InviteeSe
 }
 
 func (c Coordinator) decryptInviteeSeatingRequest(request entities.InviteeSeatingRequest) (entities.InviteeSeatingRequest, utils.Error) {
-	dbuf := make([]byte, base64.StdEncoding.DecodedLen(len(request.FkInviteeRequestId)))
-	base64.StdEncoding.Decode(dbuf, []byte(request.FkInviteeRequestId))
+	dbuf := make([]byte, base64.StdEncoding.DecodedLen(len(request.FkInviteeRequestID)))
+	base64.StdEncoding.Decode(dbuf, []byte(request.FkInviteeRequestID))
 	toDecrypt := []byte(dbuf)
 
 	newCipher, err := aes.NewCipher([]byte(key))
@@ -311,7 +311,7 @@ func (c Coordinator) decryptInviteeSeatingRequest(request entities.InviteeSeatin
 	decrypted := make([]byte, len(toDecrypt))
 	cfbdec.XORKeyStream(decrypted, toDecrypt)
 
-	request.FkInviteeRequestId = string(decrypted)
+	request.FkInviteeRequestID = string(decrypted)
 
 	return request, nil
 }

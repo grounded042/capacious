@@ -15,10 +15,10 @@ type inviteeGateway interface {
 	CreateInvitee(*entities.Invitee) error
 	// GetInviteeFromId fetches an invitee from the database
 	// based on the supplied id
-	GetInviteeFromId(string) (entities.Invitee, error)
+	GetInviteeFromID(string) (entities.Invitee, error)
 	// GetInviteeFriendFromId fetches an invitee friend from the
 	// database based on the supplied id
-	GetInviteeFriendFromId(string) (entities.InviteeFriend, error)
+	GetInviteeFriendFromID(string) (entities.InviteeFriend, error)
 	// UpdateInvitee updates an invitee in the database
 	// with info from the passed in object
 	UpdateInvitee(entities.Invitee) error
@@ -64,7 +64,7 @@ func (is inviteeService) GetInviteesForEvent(eventId string) ([]entities.Invitee
 }
 
 func (is inviteeService) CreateInviteeForEvent(invitee *entities.Invitee, event entities.Event) utils.Error {
-	invitee.FkEventId = event.EventId
+	invitee.FkEventID = event.EventID
 
 	err := is.da.CreateInvitee(invitee)
 
@@ -75,8 +75,8 @@ func (is inviteeService) CreateInviteeForEvent(invitee *entities.Invitee, event 
 	return nil
 }
 
-func (is inviteeService) GetInviteeFromId(id string) (entities.Invitee, utils.Error) {
-	invitee, err := is.da.GetInviteeFromId(id)
+func (is inviteeService) GetInviteeFromID(id string) (entities.Invitee, utils.Error) {
+	invitee, err := is.da.GetInviteeFromID(id)
 
 	if err != nil {
 		return entities.Invitee{}, utils.NewApiError(500, err.Error())
@@ -118,7 +118,7 @@ func (is inviteeService) EditInviteeFriend(updateMe entities.InviteeFriend) util
 func (is inviteeService) SetGuestMenuChoices(guestID string, choices []entities.MenuChoice) ([]entities.MenuChoice, utils.Error) {
 	// make sure that the FkGuestId is set correctly
 	for key, _ := range choices {
-		choices[key].FkGuestId = guestID
+		choices[key].FkGuestID = guestID
 	}
 
 	updatedChoices, err := is.da.SetGuestMenuChoices(guestID, choices)
@@ -130,8 +130,8 @@ func (is inviteeService) SetGuestMenuChoices(guestID string, choices []entities.
 	return updatedChoices, nil
 }
 
-func (is inviteeService) GetInviteeFriendFromId(id string) (entities.InviteeFriend, utils.Error) {
-	iFriend, err := is.da.GetInviteeFriendFromId(id)
+func (is inviteeService) GetInviteeFriendFromID(id string) (entities.InviteeFriend, utils.Error) {
+	iFriend, err := is.da.GetInviteeFriendFromID(id)
 
 	if err != nil {
 		return entities.InviteeFriend{}, utils.NewApiError(500, err.Error())
@@ -142,7 +142,7 @@ func (is inviteeService) GetInviteeFriendFromId(id string) (entities.InviteeFrie
 
 func (is inviteeService) SetGuestMenuNote(guestID string, note entities.MenuNote) (entities.MenuNote, utils.Error) {
 	// make sure that the FkGuestId is set correctly
-	note.FkGuestId = guestID
+	note.FkGuestID = guestID
 
 	updatedNote, err := is.da.SetGuestMenuNote(guestID, note)
 
@@ -156,15 +156,15 @@ func (is inviteeService) SetGuestMenuNote(guestID string, note entities.MenuNote
 func (is inviteeService) SetInviteeSeatingRequests(inviteeID string, requests []entities.InviteeSeatingRequest) ([]entities.InviteeSeatingRequest, utils.Error) {
 	// make sure that the FkGuestId is set correctly
 	for i := len(requests) - 1; i >= 0; i-- {
-		requests[i].FkInviteeId = inviteeID
+		requests[i].FkInviteeID = inviteeID
 
 		// make sure someone is not setting themselves to be a friend
-		if requests[i].FkInviteeRequestId == inviteeID {
+		if requests[i].FkInviteeRequestID == inviteeID {
 			requests = append(requests[:i], requests[i+1:]...)
 		} else {
 			// clear any existing primary keys - remember, we are replacing, not
 			// updating
-			requests[i].InviteeSeatingRequestId = ""
+			requests[i].InviteeSeatingRequestID = ""
 		}
 	}
 

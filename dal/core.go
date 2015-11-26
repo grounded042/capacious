@@ -40,8 +40,8 @@ func (dh DataHandler) GetAllEvents() ([]entities.Event, error) {
 	return events, db.Error
 }
 
-func (dh DataHandler) GetEventInfo(eventId string) (entities.Event, error) {
-	var event = entities.Event{EventId: eventId}
+func (dh DataHandler) GetEventInfo(eventID string) (entities.Event, error) {
+	var event = entities.Event{EventID: eventID}
 
 	db := dh.conn.Find(&event)
 
@@ -49,7 +49,7 @@ func (dh DataHandler) GetEventInfo(eventId string) (entities.Event, error) {
 }
 
 func (dh DataHandler) CreateEvent(createMe *entities.Event) error {
-	db := dh.conn.Create(&createMe)
+	db := dh.conn.Debug().Create(&createMe)
 
 	return db.Error
 }
@@ -109,7 +109,7 @@ func (dh DataHandler) addInviteeSeatingRequestsToInvitees(list []entities.Invite
 func (dh DataHandler) addInviteeSelfToInvitee(invitee entities.Invitee) (entities.Invitee, error) {
 	var err error
 
-	invitee.Self, err = dh.getGuestFromId(invitee.FkGuestId)
+	invitee.Self, err = dh.getGuestFromID(invitee.FkGuestID)
 
 	if err != nil {
 		return entities.Invitee{}, err
@@ -121,7 +121,7 @@ func (dh DataHandler) addInviteeSelfToInvitee(invitee entities.Invitee) (entitie
 func (dh DataHandler) addInviteeSeatingRequestsToInvitee(invitee entities.Invitee) (entities.Invitee, error) {
 	var err error
 
-	invitee.SeatingRequests, err = dh.getInviteeSeatingRequestsForInviteeID(invitee.InviteeId)
+	invitee.SeatingRequests, err = dh.getInviteeSeatingRequestsForInviteeID(invitee.InviteeID)
 
 	if err != nil {
 		return entities.Invitee{}, err
@@ -129,7 +129,7 @@ func (dh DataHandler) addInviteeSeatingRequestsToInvitee(invitee entities.Invite
 
 	// add the first and last names
 	for key, value := range invitee.SeatingRequests {
-		firstName, lastName, err := dh.getInviteeFirstNameAndLastNameFromId(value.FkInviteeRequestId)
+		firstName, lastName, err := dh.getInviteeFirstNameAndLastNameFromID(value.FkInviteeRequestID)
 
 		if err != nil {
 			return entities.Invitee{}, err
@@ -144,7 +144,7 @@ func (dh DataHandler) addInviteeSeatingRequestsToInvitee(invitee entities.Invite
 
 func (dh DataHandler) addInviteeFriendsToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
 	for key, value := range list {
-		inviteeFriends, err := dh.GetInviteeFriendsFromInviteeId(value.InviteeId)
+		inviteeFriends, err := dh.GetInviteeFriendsFromInviteeID(value.InviteeID)
 
 		if err != nil {
 			return []entities.Invitee{}, err
@@ -157,7 +157,7 @@ func (dh DataHandler) addInviteeFriendsToInvitees(list []entities.Invitee) ([]en
 }
 
 func (dh DataHandler) addInviteeFriendsToInvitee(invitee entities.Invitee) (entities.Invitee, error) {
-	inviteeFriends, err := dh.GetInviteeFriendsFromInviteeId(invitee.InviteeId)
+	inviteeFriends, err := dh.GetInviteeFriendsFromInviteeID(invitee.InviteeID)
 
 	if err != nil {
 		return entities.Invitee{}, err
@@ -168,7 +168,7 @@ func (dh DataHandler) addInviteeFriendsToInvitee(invitee entities.Invitee) (enti
 	return invitee, nil
 }
 
-func (dh DataHandler) GetInviteeFriendsFromInviteeId(id string) ([]entities.InviteeFriend, error) {
+func (dh DataHandler) GetInviteeFriendsFromInviteeID(id string) ([]entities.InviteeFriend, error) {
 	var inviteeFriends []entities.InviteeFriend
 	var count int
 
@@ -181,7 +181,7 @@ func (dh DataHandler) GetInviteeFriendsFromInviteeId(id string) ([]entities.Invi
 	}
 
 	for key, value := range inviteeFriends {
-		inviteeFriends[key].Self, db.Error = dh.getGuestFromId(value.FkGuestId)
+		inviteeFriends[key].Self, db.Error = dh.getGuestFromID(value.FkGuestID)
 
 		if db.Error != nil {
 			return []entities.InviteeFriend{}, db.Error
@@ -203,7 +203,7 @@ func (dh DataHandler) CreateInvitee(createMe *entities.Invitee) error {
 	}
 
 	// assign the id of self to the foreign key entry
-	createMe.FkGuestId = createMe.Self.GuestId
+	createMe.FkGuestID = createMe.Self.GuestID
 
 	db := dh.conn.Create(&createMe)
 
@@ -212,7 +212,7 @@ func (dh DataHandler) CreateInvitee(createMe *entities.Invitee) error {
 	}
 
 	for key, value := range createMe.Friends {
-		value.FkInviteeId = createMe.InviteeId
+		value.FkInviteeID = createMe.InviteeID
 
 		cigErr := dh.CreateInviteeFriend(&value)
 
@@ -242,14 +242,14 @@ func (dh DataHandler) CreateInviteeFriend(createMe *entities.InviteeFriend) erro
 	}
 
 	// assign the id of self to the foreign key entry
-	createMe.FkGuestId = createMe.Self.GuestId
+	createMe.FkGuestID = createMe.Self.GuestID
 
 	db := dh.conn.Create(&createMe)
 
 	return db.Error
 }
 
-func (dh DataHandler) GetInviteeFromId(id string) (entities.Invitee, error) {
+func (dh DataHandler) GetInviteeFromID(id string) (entities.Invitee, error) {
 	var invitee entities.Invitee
 
 	db := dh.conn.Where("invitee_id = ?", id).First(&invitee)
@@ -273,7 +273,7 @@ func (dh DataHandler) GetInviteeFromId(id string) (entities.Invitee, error) {
 	return dh.addInviteeFriendsToInvitee(invitee)
 }
 
-func (dh DataHandler) getInviteeFirstNameAndLastNameFromId(id string) (string, string, error) {
+func (dh DataHandler) getInviteeFirstNameAndLastNameFromID(id string) (string, string, error) {
 	var invitee entities.Invitee
 
 	db := dh.conn.Where("invitee_id = ?", id).First(&invitee)
@@ -291,7 +291,7 @@ func (dh DataHandler) getInviteeFirstNameAndLastNameFromId(id string) (string, s
 	return invitee.Self.FirstName, invitee.Self.LastName, nil
 }
 
-func (dh DataHandler) getGuestFromId(id string) (entities.Guest, error) {
+func (dh DataHandler) getGuestFromID(id string) (entities.Guest, error) {
 	var guest entities.Guest
 	var err error
 
@@ -302,13 +302,13 @@ func (dh DataHandler) getGuestFromId(id string) (entities.Guest, error) {
 		return entities.Guest{}, db.Error
 	}
 
-	guest.MenuChoices, err = dh.getMenuChoicesForGuestID(guest.GuestId)
+	guest.MenuChoices, err = dh.getMenuChoicesForGuestID(guest.GuestID)
 
 	if err != nil {
 		return entities.Guest{}, err
 	}
 
-	note, err := dh.getMenuNoteForGuestID(guest.GuestId)
+	note, err := dh.getMenuNoteForGuestID(guest.GuestID)
 
 	if err != nil {
 		return entities.Guest{}, err
@@ -336,19 +336,19 @@ func (dh DataHandler) getMenuChoicesForGuestID(guestID string) ([]entities.MenuC
 
 func (dh DataHandler) UpdateInvitee(updateMe entities.Invitee) error {
 	// get the current invitee to diff
-	curInvitee, err := dh.GetInviteeFromId(updateMe.InviteeId)
+	curInvitee, err := dh.GetInviteeFromID(updateMe.InviteeID)
 
 	if err != nil {
 		return err
 	}
 
 	// update info from db
-	updateMe.FkEventId = curInvitee.FkEventId
-	updateMe.FkGuestId = curInvitee.FkGuestId
+	updateMe.FkEventID = curInvitee.FkEventID
+	updateMe.FkGuestID = curInvitee.FkGuestID
 
 	// check and make sure the self id is not different
-	if updateMe.FkGuestId != updateMe.Self.GuestId ||
-		updateMe.Self.GuestId != curInvitee.Self.GuestId {
+	if updateMe.FkGuestID != updateMe.Self.GuestID ||
+		updateMe.Self.GuestID != curInvitee.Self.GuestID {
 		return errors.New("bad invitee self id")
 	}
 
@@ -370,18 +370,18 @@ func (dh DataHandler) updateGuest(updateMe entities.Guest) error {
 }
 
 func (dh DataHandler) UpdateInviteeFriend(updateMe entities.InviteeFriend) error {
-	curIG, err := dh.GetInviteeFriendFromId(updateMe.InviteeFriendId)
+	curIG, err := dh.GetInviteeFriendFromID(updateMe.InviteeFriendID)
 
 	if err != nil {
 		return err
 	}
 
 	// update with info from db
-	updateMe.FkGuestId = curIG.FkGuestId
-	updateMe.FkInviteeId = curIG.FkInviteeId
+	updateMe.FkGuestID = curIG.FkGuestID
+	updateMe.FkInviteeID = curIG.FkInviteeID
 
 	// check and make sure the self id is not different
-	if updateMe.FkGuestId != updateMe.Self.GuestId {
+	if updateMe.FkGuestID != updateMe.Self.GuestID {
 		return errors.New("bad invitee friend self id")
 	}
 
@@ -399,7 +399,7 @@ func (dh DataHandler) UpdateInviteeFriend(updateMe entities.InviteeFriend) error
 
 }
 
-func (dh DataHandler) GetInviteeFriendFromId(id string) (entities.InviteeFriend, error) {
+func (dh DataHandler) GetInviteeFriendFromID(id string) (entities.InviteeFriend, error) {
 	var friend entities.InviteeFriend
 	var count int
 
@@ -411,7 +411,7 @@ func (dh DataHandler) GetInviteeFriendFromId(id string) (entities.InviteeFriend,
 		return entities.InviteeFriend{}, db.Error
 	}
 
-	friend.Self, db.Error = dh.getGuestFromId(friend.FkGuestId)
+	friend.Self, db.Error = dh.getGuestFromID(friend.FkGuestID)
 
 	return friend, db.Error
 }
@@ -456,7 +456,7 @@ func (dh DataHandler) addMenuItemOptionsToMenuItems(items []entities.MenuItem) (
 // the supplied entities.MenuItem object. It returns the item with the options
 // added and any error that occured.
 func (dh DataHandler) addMenuItemOptionToMenuItem(item entities.MenuItem) (entities.MenuItem, error) {
-	opts, err := dh.getMenuItemOptionsForMenuItemID(item.MenuItemId)
+	opts, err := dh.getMenuItemOptionsForMenuItemID(item.MenuItemID)
 
 	if err != nil {
 		return item, err
@@ -524,7 +524,7 @@ func (dh DataHandler) SetGuestMenuNote(guestID string, note entities.MenuNote) (
 		return entities.MenuNote{}, err
 	}
 
-	if oldNote.MenuNoteId != "" {
+	if oldNote.MenuNoteID != "" {
 		db := dh.conn.Delete(oldNote)
 
 		if db.Error != nil {
@@ -618,7 +618,7 @@ func (dh DataHandler) GetSeatingRequestInviteesForEvent(eventID string) ([]entit
 
 	for _, value := range getStuff {
 		invitee := entities.Invitee{
-			InviteeId: value.InviteeID,
+			InviteeID: value.InviteeID,
 			Self: entities.Guest{
 				FirstName: value.FirstName,
 				LastName:  value.LastName,

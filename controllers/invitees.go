@@ -14,7 +14,7 @@ import (
 type InviteeStub interface {
 	GetInviteesForEvent(string) ([]entities.Invitee, utils.Error)
 	CreateInviteeForEvent(*entities.Invitee, entities.Event) utils.Error
-	GetInviteeFromId(string) (entities.Invitee, utils.Error)
+	GetInviteeFromID(string) (entities.Invitee, utils.Error)
 	EditInvitee(entities.Invitee) utils.Error
 	EditInviteeFriend(entities.InviteeFriend) utils.Error
 	CreateInviteeFriend(*entities.InviteeFriend) utils.Error
@@ -51,7 +51,7 @@ func (ec InviteesController) GetInviteesForEvent(c web.C, w http.ResponseWriter,
 func (ec InviteesController) CreateInviteeForEvent(c web.C, w http.ResponseWriter, r *http.Request) {
 	var invitee entities.Invitee
 
-	event := entities.Event{EventId: c.URLParams["id"]}
+	event := entities.Event{EventID: c.URLParams["id"]}
 
 	rBody, ioErr := ioutil.ReadAll(r.Body)
 
@@ -77,7 +77,7 @@ func (ec InviteesController) CreateInviteeForEvent(c web.C, w http.ResponseWrite
 }
 
 func (ic InviteesController) GetInvitee(c web.C, w http.ResponseWriter, r *http.Request) {
-	invitee, err := ic.is.GetInviteeFromId(c.URLParams["id"])
+	invitee, err := ic.is.GetInviteeFromID(c.URLParams["id"])
 
 	if err != nil {
 		w.WriteHeader(500)
@@ -89,7 +89,7 @@ func (ic InviteesController) GetInvitee(c web.C, w http.ResponseWriter, r *http.
 }
 
 func (ic InviteesController) EditInvitee(c web.C, w http.ResponseWriter, r *http.Request) {
-	invitee := entities.Invitee{InviteeId: c.URLParams["id"]}
+	invitee := entities.Invitee{InviteeID: c.URLParams["id"]}
 
 	rBody, ioErr := ioutil.ReadAll(r.Body)
 
@@ -117,7 +117,7 @@ func (ic InviteesController) EditInvitee(c web.C, w http.ResponseWriter, r *http
 }
 
 func (ic InviteesController) EditInviteeFriend(c web.C, w http.ResponseWriter, r *http.Request) {
-	iGuest := entities.InviteeFriend{InviteeFriendId: c.URLParams["friend_id"], FkInviteeId: c.URLParams["invitee_id"]}
+	iGuest := entities.InviteeFriend{InviteeFriendID: c.URLParams["friend_id"], FkInviteeID: c.URLParams["invitee_id"]}
 
 	rBody, ioErr := ioutil.ReadAll(r.Body)
 
@@ -146,7 +146,7 @@ func (ic InviteesController) EditInviteeFriend(c web.C, w http.ResponseWriter, r
 }
 
 func (ec InviteesController) CreateInviteeFriend(c web.C, w http.ResponseWriter, r *http.Request) {
-	iGuest := entities.InviteeFriend{FkInviteeId: c.URLParams["invitee_id"]}
+	iGuest := entities.InviteeFriend{FkInviteeID: c.URLParams["invitee_id"]}
 
 	rBody, ioErr := ioutil.ReadAll(r.Body)
 
