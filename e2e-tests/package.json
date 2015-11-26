@@ -1,0 +1,21 @@
+{
+  "name": "capacious-e2e-tests",
+  "version": "0.0.1",
+  "description": "end-to-end tests for the capacious API",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec --compilers js:mocha-traceur"
+  },
+  "author": "Jon Carl",
+  "license": "MIT",
+  "dependencies": {
+    "babel": "^6.1.18",
+    "babel-core": "^6.2.1",
+    "chai": "^3.4.1",
+    "eslint": "^1.10.1",
+    "mocha": "^2.3.4",
+    "mocha-traceur": "^2.1.0",
+    "supertest": "^1.1.0",
+    "traceur": "0.0.92"
+  }
+}

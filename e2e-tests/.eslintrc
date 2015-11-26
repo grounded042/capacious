@@ -1,0 +1,12 @@
+{
+    "ecmaFeatures": {
+        "es6": true,
+        "classes": true,
+        "modules": true,
+        "blockBindings": true,
+        "arrowFunctions": true,
+    },
+    "env": {
+      "es6"
+    }
+}
