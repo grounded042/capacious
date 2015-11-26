@@ -43,7 +43,7 @@ func (ec EventsController) GetEvents(c web.C, w http.ResponseWriter, r *http.Req
 func (ec EventsController) GetEventInfo(c web.C, w http.ResponseWriter, r *http.Request) {
 
 	if event, err := ec.es.GetEventInfo(c.URLParams["id"]); err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(utils.GetCodeForError(err))
 		fmt.Println(err)
 	} else {
 		w.WriteHeader(200)

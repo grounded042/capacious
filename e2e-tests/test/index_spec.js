@@ -9,7 +9,7 @@ import {
 let api = supertest('http://localhost:8000/api/v1');
 
 describe('events', () => {
-  let working_event_id = "";
+  let working_event_id = "cd7bc650-2e71-11e5-a390-675459d99309";
   let event_id_list = [];
 
   describe('creating', () => {
@@ -72,6 +72,38 @@ describe('events', () => {
       });
       // TODO: make sure it does not create the event
     });
+  });
+
+  describe('getting', () => {
+    describe('with a valid id', () => {
+      it('should return a specific object', (done) => {
+        api.get('/events/' + working_event_id)
+        .set('Accept', 'application/json')
+        .expect(200)
+        .expect('Content-Type', 'application/json')
+        .expect({
+          event_id: working_event_id,
+          name: "Picnic",
+          description: "Your normal picnic.",
+          location: "The Park",
+          start_time: "2015-12-15T17:00:00Z",
+          end_time: "2015-12-15T22:00:00Z",
+          respond_by: "2015-12-05T22:00:00Z",
+          allowed_friends: 2,
+          created_at: "2015-07-11T22:36:31.024391Z",
+          updated_at: "2015-07-11T22:36:31.024391Z"
+        }, done);
+      });
+    });
+
+    describe('with an invalid id', () => {
+      it('should return a 404', (done) => {
+        api.get('/events/cd7bc650-2e71-11e5-a390-675459d99308')
+        .set('Accept', 'application/json')
+        .expect(404, done);
+      });
+    });
+
   });
 
   // TODO:
