@@ -210,77 +210,109 @@ describe('events', () => {
 
 describe('invitees', () => {
   describe('getting', () => {
-    it('should return a valid object', (done) => {
-      api.get('/invitees/fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068')
-      .set('Accept', 'application/json')
-      .expect(200)
-      .expect('Content-Type', 'application/json')
-      .expect(
-        {
-          invitee_id: "fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068",
+    describe('with a valid invitee id', () => {
+      it('should return a valid object', (done) => {
+        api.get('/invitees/fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068')
+        .set('Accept', 'application/json')
+        .expect(200)
+        .expect('Content-Type', 'application/json')
+        .expect(
+          {
+            invitee_id: "fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068",
+            email: "shale@mann.co",
+            self: {
+              guest_id: "24669e54-5ee2-11e5-a379-7b2796b289b2",
+              first_name: "Saxton",
+              last_name: "Hale",
+              attending: false,
+              menu_choices: [
+                {
+                  menu_choice_id: "e8b849dc-9548-11e5-bea3-fbb30297c5f4",
+                  menu_item_id: "f167eb18-864e-11e5-a016-6b70107c9bc3",
+                  menu_item_option_id: "3ab2d4f0-8658-11e5-9e1b-87e2a7e99275"
+                },
+                {
+                  menu_choice_id: "e8b85cce-9548-11e5-bea3-6b3c1ff816bb",
+                  menu_item_id: "f1680616-864e-11e5-a016-63f8fbffdc49",
+                  menu_item_option_id: "3ab2eb0c-8658-11e5-9e1b-a75c88531ca7"
+                },
+                {
+                  menu_choice_id: "e8b864e4-9548-11e5-bea3-e73560bb934e",
+                  menu_item_id: "f1680ac6-864e-11e5-a016-cb0185cdad5a",
+                  menu_item_option_id: "3ab2f624-8658-11e5-9e1b-4be6473d4b3c"
+                }
+              ],
+              menu_note: "Could I have some wine with the cheese and crackers?"
+            },
+            friends: [
+              {
+                invitee_friend_id: "e6afb5b0-7b64-11e5-b861-1f0fc9657754",
+                self: {
+                  guest_id: "81e6d338-7917-11e5-8b8e-a37beb0fdab8",
+                  first_name: "Helen",
+                  last_name: "",
+                  attending: false,
+                  menu_choices: [
+                    {
+                      menu_choice_id: "e8b86a48-9548-11e5-bea3-83652079016b",
+                      menu_item_id: "f167eb18-864e-11e5-a016-6b70107c9bc3",
+                      menu_item_option_id: "3ab2e3e6-8658-11e5-9e1b-87685ca7bddd"
+                    },
+                    {
+                      menu_choice_id: "e8b86f5c-9548-11e5-bea3-6f7c95e85662",
+                      menu_item_id: "f1680616-864e-11e5-a016-63f8fbffdc49",
+                      menu_item_option_id: "3ab2ee68-8658-11e5-9e1b-4f74a992f1df"
+                    },
+                    {
+                      menu_choice_id: "e8b87448-9548-11e5-bea3-834551d829f5",
+                      menu_item_id: "f1680ac6-864e-11e5-a016-cb0185cdad5a",
+                      menu_item_option_id: "3ab2fdb8-8658-11e5-9e1b-cf4a9afb8def"
+                    }
+                  ],
+                  menu_note: ""
+                }
+              }
+            ],
+            seating_request: []
+          },
+        done);
+      });
+    });
+  });
+
+  describe('editting', () => {
+    describe('with a valid invitee id', () => {
+      it('should return a valid, updated object', (done) => {
+        api.patch('/invitees/fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068')
+        .set('Accept', 'application/json')
+        .send({
           email: "shale@mann.co",
           self: {
             guest_id: "24669e54-5ee2-11e5-a379-7b2796b289b2",
             first_name: "Saxton",
             last_name: "Hale",
-            attending: false,
-            menu_choices: [
-              {
-                menu_choice_id: "e8b849dc-9548-11e5-bea3-fbb30297c5f4",
-                menu_item_id: "f167eb18-864e-11e5-a016-6b70107c9bc3",
-                menu_item_option_id: "3ab2d4f0-8658-11e5-9e1b-87e2a7e99275"
-              },
-              {
-                menu_choice_id: "e8b85cce-9548-11e5-bea3-6b3c1ff816bb",
-                menu_item_id: "f1680616-864e-11e5-a016-63f8fbffdc49",
-                menu_item_option_id: "3ab2eb0c-8658-11e5-9e1b-a75c88531ca7"
-              },
-              {
-                menu_choice_id: "e8b864e4-9548-11e5-bea3-e73560bb934e",
-                menu_item_id: "f1680ac6-864e-11e5-a016-cb0185cdad5a",
-                menu_item_option_id: "3ab2f624-8658-11e5-9e1b-4be6473d4b3c"
-              }
-            ],
-            menu_note: "Could I have some wine with the cheese and crackers?"
+            attending: true
+          }
+        })
+        .expect(200)
+        .expect('Content-Type', 'application/json')
+        .expect(
+          {
+            invitee_id: "fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068",
+            email: "shale@mann.co",
+            self: {
+              guest_id: "24669e54-5ee2-11e5-a379-7b2796b289b2",
+              first_name: "Saxton",
+              last_name: "Hale",
+              attending: true,
+              menu_choices: null,
+              menu_note: ""
+            },
+            friends: null,
+            seating_request: null
           },
-          friends: [
-            {
-              invitee_friend_id: "e6afb5b0-7b64-11e5-b861-1f0fc9657754",
-              self: {
-                guest_id: "81e6d338-7917-11e5-8b8e-a37beb0fdab8",
-                first_name: "Helen",
-                last_name: "",
-                attending: false,
-                menu_choices: [
-                  {
-                    menu_choice_id: "e8b86a48-9548-11e5-bea3-83652079016b",
-                    menu_item_id: "f167eb18-864e-11e5-a016-6b70107c9bc3",
-                    menu_item_option_id: "3ab2e3e6-8658-11e5-9e1b-87685ca7bddd"
-                  },
-                  {
-                    menu_choice_id: "e8b86f5c-9548-11e5-bea3-6f7c95e85662",
-                    menu_item_id: "f1680616-864e-11e5-a016-63f8fbffdc49",
-                    menu_item_option_id: "3ab2ee68-8658-11e5-9e1b-4f74a992f1df"
-                  },
-                  {
-                    menu_choice_id: "e8b87448-9548-11e5-bea3-834551d829f5",
-                    menu_item_id: "f1680ac6-864e-11e5-a016-cb0185cdad5a",
-                    menu_item_option_id: "3ab2fdb8-8658-11e5-9e1b-cf4a9afb8def"
-                  }
-                ],
-                menu_note: ""
-              }
-            }
-          ],
-          seating_request: []
-        },
-      done);
-    });
-  });
-
-  describe('editting invitee', () => {
-    describe('with a valid invitee id', () => {
-
+        done);
+      });
     });
   });
 
