@@ -317,7 +317,46 @@ describe('invitees', () => {
   });
 
   describe('creating invitee friend', () => {
+    it('should return a valid, new object', (done) => {
+      api.post('/invitees/fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068/relationships/friends')
+      .set('Accept', 'application/json')
+      .send({
+        self: {
+          first_name: "Friend",
+          last_name: "",
+          attending: true
+        }
+      })
+      .expect(201)
+      .expect('Content-Type', 'application/json')
+      .expect((res) => {
+        // check the UUID
+        let cur_id = res.body.invitee_friend_id;
+        if (!validUUID(cur_id)) {
+          throw new Error("invitee_friend_id is not a UUID")
+        }
+        res.body.invitee_friend_id = 'FIXED_ID';
 
+        cur_id = res.body.self.guest_id;
+        if (!validUUID(cur_id)) {
+          throw new Error("self.guest_id is not a UUID")
+        }
+        res.body.self.guest_id = 'FIXED_ID';
+      })
+      .expect(
+        {
+          invitee_friend_id: "FIXED_ID",
+          self: {
+            guest_id: "FIXED_ID",
+            first_name: "Friend",
+            last_name: "",
+            attending: true,
+            menu_choices: null,
+            menu_note: ""
+          }
+        },
+      done);
+    });
   });
 
   describe('editting invitee friend', () => {
