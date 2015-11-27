@@ -12,8 +12,8 @@ type Event struct {
 	EndTime        time.Time `json:"end_time"`
 	RespondBy      time.Time `json:"respond_by"`
 	AllowedFriends int       `json:"allowed_friends"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	CreatedAt      time.Time `json:"-"`
+	UpdatedAt      time.Time `json:"-"`
 }
 
 // Guest represents an object that contains details about a specific guest.
@@ -26,8 +26,8 @@ type Guest struct {
 	Attending   bool         `json:"attending"`
 	MenuChoices []MenuChoice `json:"menu_choices"`
 	MenuNote    string       `sql:"-" json:"menu_note"`
-	CreatedAt   time.Time    `json:"created_at"`
-	UpdatedAt   time.Time    `json:"updated_at"`
+	CreatedAt   time.Time    `json:"-"`
+	UpdatedAt   time.Time    `json:"-"`
 }
 
 // Invitee represents an object that contains details about a specific invitee.
@@ -44,8 +44,8 @@ type Invitee struct {
 	Self            Guest                   `json:"self"`
 	Friends         []InviteeFriend         `json:"friends"`
 	SeatingRequests []InviteeSeatingRequest `json:"seating_request"`
-	CreatedAt       time.Time               `json:"created_at"`
-	UpdatedAt       time.Time               `json:"updated_at"`
+	CreatedAt       time.Time               `json:"-"`
+	UpdatedAt       time.Time               `json:"-"`
 }
 
 // InviteeFriend represents an object that contains details about a specific
@@ -58,8 +58,8 @@ type InviteeFriend struct {
 	FkInviteeID     string    `json:"-"`
 	FkGuestID       string    `json:"-"`
 	Self            Guest     `json:"self"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	CreatedAt       time.Time `json:"-"`
+	UpdatedAt       time.Time `json:"-"`
 }
 
 // MenuItem represents an object that contains details about a specific menu
@@ -75,8 +75,8 @@ type MenuItem struct {
 	Name       string           `json:"name"`
 	NumChoices int              `json:"num_choices"`
 	Options    []MenuItemOption `json:"options"`
-	CreatedAt  time.Time        `json:"created_at"`
-	UpdatedAt  time.Time        `json:"updated_at"`
+	CreatedAt  time.Time        `json:"-"`
+	UpdatedAt  time.Time        `json:"-"`
 }
 
 // MenuItemOption represents an object that contains details about a specific
@@ -88,8 +88,8 @@ type MenuItemOption struct {
 	FkMenuItemID     string    `json:"-"`
 	Name             string    `json:"name"`
 	Description      string    `json:"description"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
+	CreatedAt        time.Time `json:"-"`
+	UpdatedAt        time.Time `json:"-"`
 }
 
 // MenuChoice represents an object that contains details about a specific menu
@@ -102,8 +102,8 @@ type MenuChoice struct {
 	FkGuestID          string    `json:"-"`
 	FkMenuItemID       string    `json:"menu_item_id"`
 	FkMenuItemOptionID string    `json:"menu_item_option_id"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	CreatedAt          time.Time `json:"-"`
+	UpdatedAt          time.Time `json:"-"`
 }
 
 // MenuNote represents an object that contains details about a specific menu
@@ -115,8 +115,8 @@ type MenuNote struct {
 	MenuNoteID string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"menu_note_id"`
 	FkGuestID  string    `json:"-"`
 	NoteBody   string    `json:"note_body"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	CreatedAt  time.Time `json:"-"`
+	UpdatedAt  time.Time `json:"-"`
 }
 
 // InviteeSeatingRequest represents an object that contains details about a
@@ -132,8 +132,8 @@ type InviteeSeatingRequest struct {
 	FkInviteeRequestID      string    `json:"invitee_request_id"`
 	FirstName               string    `sql:"-" json:"first_name"`
 	LastName                string    `sql:"-" json:"last_name"`
-	CreatedAt               time.Time `json:"created_at"`
-	UpdatedAt               time.Time `json:"updated_at"`
+	CreatedAt               time.Time `json:"-"`
+	UpdatedAt               time.Time `json:"-"`
 }
 
 // SeatingRequestChoice represents an object that contains details about a
