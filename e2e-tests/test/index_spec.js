@@ -230,6 +230,33 @@ describe('events', () => {
         });
       });
     });
+
+    describe('seating request choices', () => {
+      describe('with a valid event id', () => {
+        it('should return a specific object', (done) => {
+          api.get('/events/' + working_event_id + '/relationships/seating_request_choices')
+          .set('Accept', 'application/json')
+          .expect(200)
+          .expect('Content-Type', 'application/json')
+          .expect(
+            [
+              {
+                "invitee_request_id": "EZXuzAu5FO9mw8UiBOqHakzvgJ1RMkOPoz4X27DpyvFwBM1i",
+                "first_name": "Saxton",
+                "last_name": "Hale"
+              }
+            ], done);
+        });
+      });
+
+      describe('with an invalid event id', () => {
+        it('should return a 404', (done) => {
+          api.get('/events/cd7bc650-2e71-11e5-a390-675459d99308/relationships/seating_request_choices')
+          .set('Accept', 'application/json')
+          .expect(404, done);
+        });
+      });
+    });
   });
 
   // TODO:

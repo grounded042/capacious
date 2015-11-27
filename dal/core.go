@@ -614,6 +614,8 @@ func (dh DataHandler) GetSeatingRequestInviteesForEvent(eventID string) ([]entit
 
 	if db.Error != nil {
 		return []entities.Invitee{}, db.Error
+	} else if len(getStuff) == 0 {
+		return []entities.Invitee{}, errors.New("record not found")
 	}
 
 	for _, value := range getStuff {

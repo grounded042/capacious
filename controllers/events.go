@@ -90,7 +90,7 @@ func (ec EventsController) GetMenuItemsForEvent(c web.C, w http.ResponseWriter, 
 
 func (ec EventsController) GetListOfSeatingRequestChoices(c web.C, w http.ResponseWriter, r *http.Request) {
 	if choices, err := ec.es.GetListOfSeatingRequestChoices(c.URLParams["id"]); err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(utils.GetCodeForError(err))
 		fmt.Println(err)
 	} else {
 		w.WriteHeader(200)
