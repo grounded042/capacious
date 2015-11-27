@@ -360,7 +360,33 @@ describe('invitees', () => {
   });
 
   describe('editting invitee friend', () => {
-
+    it('should return a valid, updated object', (done) => {
+      api.patch('/invitees/fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068/relationships/friends/e6afb5b0-7b64-11e5-b861-1f0fc9657754')
+      .set('Accept', 'application/json')
+      .send({
+        self: {
+          guest_id: "81e6d338-7917-11e5-8b8e-a37beb0fdab8",
+          first_name: "Friend",
+          last_name: "",
+          attending: false
+        }
+      })
+      .expect(200)
+      .expect('Content-Type', 'application/json')
+      .expect(
+        {
+          invitee_friend_id: "e6afb5b0-7b64-11e5-b861-1f0fc9657754",
+          self: {
+            guest_id: "81e6d338-7917-11e5-8b8e-a37beb0fdab8",
+            first_name: "Friend",
+            last_name: "",
+            attending: false,
+            menu_choices: null,
+            menu_note: ""
+          }
+        },
+      done);
+    });
   });
 
   describe('setting menu choices', () => {
