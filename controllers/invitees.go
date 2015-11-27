@@ -166,7 +166,7 @@ func (ec InviteesController) CreateInviteeFriend(c web.C, w http.ResponseWriter,
 		w.WriteHeader(500)
 		fmt.Println(err)
 	} else {
-		w.WriteHeader(200)
+		w.WriteHeader(201)
 		json.NewEncoder(w).Encode(iGuest)
 	}
 }
