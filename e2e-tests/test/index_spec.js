@@ -6,7 +6,7 @@ import {
   isDateLessThanASecondOld as validDate
 } from '../helpers';
 
-let api = supertest('http://localhost:8000/api/v1');
+let api = supertest(`http://localhost:${process.env.PORT}/api/v1`);
 
 describe('events', () => {
   let working_event_id = "cd7bc650-2e71-11e5-a390-675459d99309";

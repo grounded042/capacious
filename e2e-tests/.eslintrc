@@ -5,6 +5,7 @@
         "modules": true,
         "blockBindings": true,
         "arrowFunctions": true,
+        "templateStrings": true,
     },
     "env": {
       "es6"
