@@ -80,7 +80,7 @@ func (ec EventsController) CreateEvent(c web.C, w http.ResponseWriter, r *http.R
 // GetMenuItemsForEvent renders the menu items for an event using w.
 func (ec EventsController) GetMenuItemsForEvent(c web.C, w http.ResponseWriter, r *http.Request) {
 	if items, err := ec.es.GetMenuItemsForEvent(c.URLParams["id"]); err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(utils.GetCodeForError(err))
 		fmt.Println(err)
 	} else {
 		w.WriteHeader(200)

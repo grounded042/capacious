@@ -104,6 +104,132 @@ describe('events', () => {
       });
     });
 
+    describe('menu items', () => {
+      describe('with a valid event id', () => {
+        it('should return a specific object', (done) => {
+          api.get('/events/' + working_event_id + '/relationships/menu_items')
+          .set('Accept', 'application/json')
+          .expect(200)
+          .expect('Content-Type', 'application/json')
+          .expect(function(res) {
+            // for now, until we figure out dates, block them out
+
+            res.body[0].options[0].created_at = "FIXED_DATE";
+            res.body[0].options[0].updated_at = "FIXED_DATE";
+            res.body[0].options[1].created_at = "FIXED_DATE";
+            res.body[0].options[1].updated_at = "FIXED_DATE";
+            res.body[0].options[2].created_at = "FIXED_DATE";
+            res.body[0].options[2].updated_at = "FIXED_DATE";
+            res.body[0].created_at = "FIXED_DATE";
+            res.body[0].updated_at = "FIXED_DATE";
+
+            res.body[1].options[0].created_at = "FIXED_DATE";
+            res.body[1].options[0].updated_at = "FIXED_DATE";
+            res.body[1].options[1].created_at = "FIXED_DATE";
+            res.body[1].options[1].updated_at = "FIXED_DATE";
+            res.body[1].created_at = "FIXED_DATE";
+            res.body[1].updated_at = "FIXED_DATE";
+
+            res.body[2].options[0].created_at = "FIXED_DATE";
+            res.body[2].options[0].updated_at = "FIXED_DATE";
+            res.body[2].options[1].created_at = "FIXED_DATE";
+            res.body[2].options[1].updated_at = "FIXED_DATE";
+            res.body[2].created_at = "FIXED_DATE";
+            res.body[2].updated_at = "FIXED_DATE";
+          })
+          .expect(
+            [
+              {
+                menu_item_id: "f167eb18-864e-11e5-a016-6b70107c9bc3",
+                item_order: 1,
+                name: "Snacks",
+                num_choices: 1,
+                options: [
+                  {
+                    menu_item_option_id: "3ab2d4f0-8658-11e5-9e1b-87e2a7e99275",
+                    name: "Cheese & Crackers",
+                    description: "Your typical cheese and crackers snack.",
+                    created_at: "FIXED_DATE",
+                    updated_at: "FIXED_DATE"
+                  },
+                  {
+                    menu_item_option_id: "3ab2e3e6-8658-11e5-9e1b-87685ca7bddd",
+                    name: "Pretzels",
+                    description: "See name.",
+                    created_at: "FIXED_DATE",
+                    updated_at: "FIXED_DATE"
+                  },
+                  {
+                    menu_item_option_id: "3ab2e7b0-8658-11e5-9e1b-0b8bf81bc16c",
+                    name: "Graham Crackers",
+                    description: "A cracker made of graham.",
+                    created_at: "FIXED_DATE",
+                    updated_at: "FIXED_DATE"
+                  }
+                ],
+                created_at: "FIXED_DATE",
+                updated_at: "FIXED_DATE"
+              },
+              {
+                menu_item_id: "f1680616-864e-11e5-a016-63f8fbffdc49",
+                item_order: 2,
+                name: "Sandwich",
+                num_choices: 1,
+                options: [
+                  {
+                    menu_item_option_id: "3ab2eb0c-8658-11e5-9e1b-a75c88531ca7",
+                    name: "BLT",
+                    description: "Bacon, lettuce, and tomato. A classic.",
+                    created_at: "FIXED_DATE",
+                    updated_at: "FIXED_DATE"
+                  },
+                  {
+                    menu_item_option_id: "3ab2ee68-8658-11e5-9e1b-4f74a992f1df",
+                    name: "Grilled Cheese",
+                    description: "You cannnot go wrong.",
+                    created_at: "FIXED_DATE",
+                    updated_at: "FIXED_DATE"
+                  }
+                ],
+                created_at: "FIXED_DATE",
+                updated_at: "FIXED_DATE"
+              },
+              {
+                menu_item_id: "f1680ac6-864e-11e5-a016-cb0185cdad5a",
+                item_order: 3,
+                name: "Dessert",
+                num_choices: 1,
+                options: [
+                  {
+                    menu_item_option_id: "3ab2f624-8658-11e5-9e1b-4be6473d4b3c",
+                    name: "Brownies",
+                    description: "Moist and delicious.",
+                    created_at: "FIXED_DATE",
+                    updated_at: "FIXED_DATE"
+                  },
+                  {
+                    menu_item_option_id: "3ab2fdb8-8658-11e5-9e1b-cf4a9afb8def",
+                    name: "Chocolate Chip Cookies",
+                    description: "Gooey and good.",
+                    created_at: "FIXED_DATE",
+                    updated_at: "FIXED_DATE"
+                  }
+                ],
+                created_at: "FIXED_DATE",
+                updated_at: "FIXED_DATE"
+              }
+            ], done);
+        });
+      });
+
+      describe('with an invalid event id', () => {
+        it('should return a 404', (done) => {
+          api.get('/events/cd7bc650-2e71-11e5-a390-675459d99308/relationships/menu_items')
+          .set('Accept', 'application/json')
+          .expect(404, done);
+        });
+      });
+    });
   });
 
   // TODO:

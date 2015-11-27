@@ -416,7 +416,7 @@ func (dh DataHandler) GetInviteeFriendFromID(id string) (entities.InviteeFriend,
 	return friend, db.Error
 }
 
-// GetMenuItemsForEvent gets the menu items for an event bases on the
+// GetMenuItemsForEvent gets the menu items for an event based on the
 // event id eventID. It returns a slice of menu items and any errors that
 // occured.
 func (dh DataHandler) GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, error) {
@@ -425,10 +425,10 @@ func (dh DataHandler) GetMenuItemsForEvent(eventID string) ([]entities.MenuItem,
 
 	db := dh.conn.Where("fk_event_id = ?", eventID).Find(&items).Count(&count)
 
-	if count == 0 {
-		return []entities.MenuItem{}, nil
-	} else if db.Error != nil {
+	if db.Error != nil {
 		return []entities.MenuItem{}, db.Error
+	} else if count == 0 {
+		return []entities.MenuItem{}, errors.New("record not found")
 	}
 
 	return dh.addMenuItemOptionsToMenuItems(items)
