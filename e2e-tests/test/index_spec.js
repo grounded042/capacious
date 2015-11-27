@@ -185,6 +185,11 @@ describe('events', () => {
                 "invitee_request_id": "EZXuzAu5FO9mw8UiBOqHakzvgJ1RMkOPoz4X27DpyvFwBM1i",
                 "first_name": "Saxton",
                 "last_name": "Hale"
+              },
+              {
+                "invitee_request_id": "EZXuzAu5FO9mw8UiBOqHakzvgJ1RMkOPoz4X27DpyvFwBMxi",
+                "first_name": "Soldier",
+                "last_name": ""
               }
             ], done);
         });
@@ -446,7 +451,34 @@ describe('invitees', () => {
   });
 
   describe('setting seating requests', () => {
-
+    it('should return an object with valid UUIDs', (done) => {
+      api.post('/invitees/fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068/relationships/seating_requests')
+      .set('Accept', 'application/json')
+      .send([
+        {
+          invitee_request_id: "EZXuzAu5FO9mw8UiBOqHakzvgJ1RMkOPoz4X27DpyvFwBMxi",
+        }
+      ])
+      .expect(200)
+      .expect('Content-Type', 'application/json')
+      .expect((res) => {
+        // check the UUID
+        let cur_id = res.body[0].invitee_seating_request_id;
+        if (!validUUID(cur_id)) {
+          throw new Error("invitee_seating_request_id is not a UUID")
+        }
+        res.body[0].invitee_seating_request_id = 'FIXED_ID';
+      })
+      .expect([
+        {
+          invitee_seating_request_id: "FIXED_ID",
+          invitee_request_id: "EZXuzAu5FO9mw8UiBOqHakzvgJ1RMkOPoz4X27DpyvFwBMxi",
+          first_name: "",
+          last_name: ""
+        }
+      ],
+      done);
+    });
   });
 
   describe('editting invitee friend menu choices', () => {

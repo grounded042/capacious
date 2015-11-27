@@ -100,6 +100,17 @@ BEGIN
       '81e6d338-7917-11e5-8b8e-a37beb0fdab8'
     );
 
+    INSERT INTO guests(guest_id, first_name, last_name, attending)
+    VALUES (
+      '81e6d338-7917-11e5-8b8e-a37beb0fdae8', 'Soldier', '', FALSE
+    );
+
+    INSERT INTO invitees(invitee_id, fk_event_id, fk_guest_id, email)
+    VALUES (
+      'fb3c11f8-7917-11e5-8b8e-b3a0b1b9b078', 'cd7bc650-2e71-11e5-a390-675459d99309',
+      '81e6d338-7917-11e5-8b8e-a37beb0fdae8', 'soldier@mann.co'
+    );
+
     -- set menu choices for the created invitee and friend
     INSERT INTO menu_choices(menu_choice_id, fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
     VALUES (
