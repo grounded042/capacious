@@ -421,7 +421,28 @@ describe('invitees', () => {
   });
 
   describe('setting menu notes', () => {
-
+    it('should return an object with valid UUIDs', (done) => {
+      api.post('/invitees/fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068/relationships/menu_note')
+      .set('Accept', 'application/json')
+      .send({
+        note_body: "I like cheese."
+      })
+      .expect(200)
+      .expect('Content-Type', 'application/json')
+      .expect((res) => {
+        // check the UUID
+        let cur_id = res.body.menu_note_id;
+        if (!validUUID(cur_id)) {
+          throw new Error("menu_note_id is not a UUID")
+        }
+        res.body.menu_note_id = 'FIXED_ID';
+      })
+      .expect({
+        menu_note_id: "FIXED_ID",
+        note_body: "I like cheese."
+      },
+      done);
+    });
   });
 
   describe('setting seating requests', () => {
