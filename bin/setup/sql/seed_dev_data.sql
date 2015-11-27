@@ -101,10 +101,10 @@ BEGIN
     );
 
     -- set menu choices for the created invitee and friend
-    INSERT INTO menu_choices(fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
+    INSERT INTO menu_choices(menu_choice_id, fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
     VALUES (
-      '24669e54-5ee2-11e5-a379-7b2796b289b2', '3AB2D4F0-8658-11E5-9E1B-87E2A7E99275',
-      'F167EB18-864E-11E5-A016-6B70107C9BC3'
+      'e8b849dc-9548-11e5-bea3-fbb30297c5f4', '24669e54-5ee2-11e5-a379-7b2796b289b2',
+      '3AB2D4F0-8658-11E5-9E1B-87E2A7E99275', 'F167EB18-864E-11E5-A016-6B70107C9BC3'
     );
 
     -- INSERT INTO menu_choices(fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
@@ -113,22 +113,22 @@ BEGIN
     --   'F167EB18-864E-11E5-A016-6B70107C9BC3'
     -- );
 
-    INSERT INTO menu_choices(fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
+    INSERT INTO menu_choices(menu_choice_id, fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
     VALUES (
-      '24669e54-5ee2-11e5-a379-7b2796b289b2', '3AB2EB0C-8658-11E5-9E1B-A75C88531CA7',
-      'F1680616-864E-11E5-A016-63F8FBFFDC49'
+      'e8b85cce-9548-11e5-bea3-6b3c1ff816bb', '24669e54-5ee2-11e5-a379-7b2796b289b2',
+      '3AB2EB0C-8658-11E5-9E1B-A75C88531CA7', 'F1680616-864E-11E5-A016-63F8FBFFDC49'
     );
 
-    INSERT INTO menu_choices(fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
+    INSERT INTO menu_choices(menu_choice_id, fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
     VALUES (
-      '24669e54-5ee2-11e5-a379-7b2796b289b2', '3AB2F624-8658-11E5-9E1B-4BE6473D4B3C',
-      'F1680AC6-864E-11E5-A016-CB0185CDAD5A'
+      'e8b864e4-9548-11e5-bea3-e73560bb934e', '24669e54-5ee2-11e5-a379-7b2796b289b2',
+      '3AB2F624-8658-11E5-9E1B-4BE6473D4B3C', 'F1680AC6-864E-11E5-A016-CB0185CDAD5A'
     );
 
-    INSERT INTO menu_choices(fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
+    INSERT INTO menu_choices(menu_choice_id, fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
     VALUES (
-      '81e6d338-7917-11e5-8b8e-a37beb0fdab8', '3AB2E3E6-8658-11E5-9E1B-87685CA7BDDD',
-      'F167EB18-864E-11E5-A016-6B70107C9BC3'
+      'e8b86a48-9548-11e5-bea3-83652079016b', '81e6d338-7917-11e5-8b8e-a37beb0fdab8',
+      '3AB2E3E6-8658-11E5-9E1B-87685CA7BDDD', 'F167EB18-864E-11E5-A016-6B70107C9BC3'
     );
 
     -- INSERT INTO menu_choices(fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
@@ -137,16 +137,16 @@ BEGIN
     --   'F167EB18-864E-11E5-A016-6B70107C9BC3'
     -- );
 
-    INSERT INTO menu_choices(fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
+    INSERT INTO menu_choices(menu_choice_id, fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
     VALUES (
-      '81e6d338-7917-11e5-8b8e-a37beb0fdab8', '3AB2EE68-8658-11E5-9E1B-4F74A992F1DF',
-      'F1680616-864E-11E5-A016-63F8FBFFDC49'
+      'e8b86f5c-9548-11e5-bea3-6f7c95e85662', '81e6d338-7917-11e5-8b8e-a37beb0fdab8',
+      '3AB2EE68-8658-11E5-9E1B-4F74A992F1DF', 'F1680616-864E-11E5-A016-63F8FBFFDC49'
     );
 
-    INSERT INTO menu_choices(fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
+    INSERT INTO menu_choices(menu_choice_id, fk_guest_id, fk_menu_item_option_id, fk_menu_item_id)
     VALUES (
-      '81e6d338-7917-11e5-8b8e-a37beb0fdab8', '3AB2FDB8-8658-11E5-9E1B-CF4A9AFB8DEF',
-      'F1680AC6-864E-11E5-A016-CB0185CDAD5A'
+      'e8b87448-9548-11e5-bea3-834551d829f5', '81e6d338-7917-11e5-8b8e-a37beb0fdab8',
+      '3AB2FDB8-8658-11E5-9E1B-CF4A9AFB8DEF', 'F1680AC6-864E-11E5-A016-CB0185CDAD5A'
     );
 
     INSERT INTO menu_notes(fk_guest_id, note_body)
