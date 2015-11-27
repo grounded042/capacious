@@ -390,7 +390,34 @@ describe('invitees', () => {
   });
 
   describe('setting menu choices', () => {
-
+    it('should return an object with valid UUIDs', (done) => {
+      api.post('/invitees/fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068/relationships/menu_choices')
+      .set('Accept', 'application/json')
+      .send([
+          {
+            menu_item_option_id: "3ab2fdb8-8658-11e5-9e1b-cf4a9afb8def",
+            menu_item_id: "f1680ac6-864e-11e5-a016-cb0185cdad5a"
+          }
+      ])
+      .expect(200)
+      .expect('Content-Type', 'application/json')
+      .expect((res) => {
+        // check the UUID
+        let cur_id = res.body[0].menu_choice_id;
+        if (!validUUID(cur_id)) {
+          throw new Error("menu_choice_id is not a UUID")
+        }
+        res.body[0].menu_choice_id = 'FIXED_ID';
+      })
+      .expect([
+          {
+            menu_choice_id: "FIXED_ID",
+            menu_item_id: "f1680ac6-864e-11e5-a016-cb0185cdad5a",
+            menu_item_option_id: "3ab2fdb8-8658-11e5-9e1b-cf4a9afb8def"
+          }
+        ],
+      done);
+    });
   });
 
   describe('setting menu notes', () => {
