@@ -25,6 +25,7 @@ func main() {
 
 	// apply the middleware
 	goji.Use(middleware.ContentTypeHeader)
+	goji.Use(middleware.JWTMiddleware)
 	goji.Use(middleware.CORS)
 
 	routes.BuildRoutes(capaciousAPIServer, routes.EventRoutes(ac.Controllers), *prefix)
