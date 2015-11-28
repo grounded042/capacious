@@ -329,7 +329,7 @@ func (c Coordinator) Login(lUser LoginUser) (string, utils.Error) {
 
 // GenerateToken will generate a new token for the provided user id
 func (c Coordinator) GenerateToken(userID string) (string, utils.Error) {
-	return "", utils.NewApiError(500, "error")
+	return c.auth.GenerateToken(userID);
 }
 
 // end auth coordination

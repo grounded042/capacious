@@ -85,4 +85,46 @@ describe('auth', () => {
       });
     });
   });
+
+  describe('token refresh', () => {
+    describe('with a valid JWT', () => {
+      it('should return a valid JWT', (done) => {
+        let token = jwt.sign({ sub: "user_id" }, secret, {
+          algorithm: "HS512",
+          expiresIn: "2 days",
+        });
+
+        api.get('/token')
+        .set('Authorization', `Bearer ${token}`)
+        .set('Accept', 'application/json')
+        .expect((res) => {
+          let token = res.body.token;
+
+          jwt.verify(token, secret, {
+            algorithms: ["HS512"]
+          });
+        })
+        .expect(200, done);
+      });
+    });
+
+    describe('with an invalid JWT', () => {
+      it('should return no token and a 401', (done) => {
+        let token = jwt.sign({ sub: "user_id" }, "this_is_not_the_right_secret", {
+          algorithm: "HS256",
+          expiresIn: "2 days",
+        });
+
+        api.get('/token')
+        .set('Authorization', `Bearer ${token}`)
+        .set('Accept', 'application/json')
+        .expect((res) => {
+          if (res.body.token !== undefined) {
+            throw new Error("token is not undefined!")
+          };
+        })
+        .expect(500, done);
+      });
+    });
+  });
 });
