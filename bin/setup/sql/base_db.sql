@@ -103,3 +103,11 @@ CREATE TABLE IF NOT EXISTS user_logins (
     created_at timestamp default current_timestamp,
     updated_at timestamp default current_timestamp
 );
+
+CREATE TABLE IF NOT EXISTS event_admins (
+  event_admin_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
+  fk_user_id uuid REFERENCES users (user_id),
+  fk_event_id uuid REFERENCES events (event_id),
+  created_at timestamp default current_timestamp,
+  updated_at timestamp default current_timestamp
+);

@@ -181,4 +181,11 @@ BEGIN
     );
     -- End create test user
 
+    -- Link the user to the event
+    INSERT INTO event_admins (fk_user_id, fk_event_id)
+    VALUES(
+      'cd7bc650-2e71-11e5-a390-675459d99309', 'cd7bc650-2e71-11e5-a390-675459d99309'
+    );
+    -- End linking the user
+
 END $$
