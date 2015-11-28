@@ -632,3 +632,20 @@ func (dh DataHandler) GetSeatingRequestInviteesForEvent(eventID string) ([]entit
 
 	return invitees, nil
 }
+
+// GetUserLoginFromEmail gets a userlogin object from the database that relates
+// to a user with the specified email address
+func (dh DataHandler) GetUserLoginFromEmail(email string) (entities.UserLogin, error) {
+	user := new(entities.User)
+
+	db := dh.conn.Where("email = ?", email).First(&user)
+
+	if db.Error != nil {
+		return entities.UserLogin{}, db.Error
+	}
+
+	findMe := new(entities.UserLogin)
+	db = dh.conn.Where("fk_user_id = ?", user.UserID).First(&findMe)
+
+	return *findMe, db.Error
+}

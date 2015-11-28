@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS user_logins (
     user_login_id uuid DEFAULT uuid_generate_v1mc() PRIMARY KEY,
-    user_id uuid UNIQUE REFERENCES users (user_id),
+    fk_user_id uuid UNIQUE REFERENCES users (user_id),
     salt varchar(255) NOT NULL,
     password varchar(255) NOT NULL,
     created_at timestamp default current_timestamp,

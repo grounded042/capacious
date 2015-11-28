@@ -47,4 +47,42 @@ describe('auth', () => {
       .expect(401, done);
     });
   });
+
+  describe('login', () => {
+    describe('with valid creds', () => {
+      it('should return a valid JWT', (done) => {
+        api.post('/token')
+        .send({
+          email: "1498@aperturescience.com",
+          password: "GLaDOS",
+        })
+        .set('Accept', 'application/json')
+        .expect((res) => {
+          let token = res.body.token;
+
+          jwt.verify(token, secret, {
+            algorithms: ["HS512"]
+          });
+        })
+        .expect(200, done);
+      });
+    });
+
+    describe('with invalid creds', () => {
+      it('should return no token and 401', (done) => {
+        api.post('/token')
+        .send({
+          email: "1498@aperturescience.com",
+          password: "GLaDOs",
+        })
+        .set('Accept', 'application/json')
+        .expect((res) => {
+          if (res.body.token !== undefined) {
+            throw new Error("token is not undefined!")
+          };
+        })
+        .expect(401, done);
+      });
+    });
+  });
 });

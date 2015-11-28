@@ -30,6 +30,7 @@ func main() {
 
 	routes.BuildRoutes(capaciousAPIServer, routes.EventRoutes(ac.Controllers), *prefix)
 	routes.BuildRoutes(capaciousAPIServer, routes.InviteeRoutes(ac.Controllers), *prefix)
+	routes.BuildRoutes(capaciousAPIServer, routes.AuthRoutes(ac.Controllers), *prefix)
 
 	goji.Serve()
 }

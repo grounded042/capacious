@@ -160,7 +160,7 @@ type User struct {
 // UserLogin holds the details necessary to authenticate a user with the system.
 type UserLogin struct {
 	UserLoginID string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"-"`
-	UserID      string    `json:"-"`
+	FkUserID    string    `json:"-"`
 	Salt        string    `json:"-"`
 	Password    string    `json:"-"`
 	CreatedAt   time.Time `json:"-"`
