@@ -170,13 +170,13 @@ BEGIN
     -- email: 1498@aperturescience.com
     INSERT INTO users(user_id, email, first_name, last_name)
     VALUES (
-      'cd7bc650-2e71-11e5-a390-675459d99309', '1498@aperturescience.com',
+      'cd7bc650-2e71-11e5-a390-675459b99309', '1498@aperturescience.com',
       'Chell', ''
     );
 
     INSERT INTO user_logins (fk_user_id, salt, password)
     VALUES(
-      'cd7bc650-2e71-11e5-a390-675459d99309', 'ooTMlzsYH92s2cIaAn70nQ1fDTx8y4M5NLG0md2i6Cb+c65D1qv8URWRIcAVprw/DgUzEm9cF562HM52tv13Fw==',
+      'cd7bc650-2e71-11e5-a390-675459b99309', 'ooTMlzsYH92s2cIaAn70nQ1fDTx8y4M5NLG0md2i6Cb+c65D1qv8URWRIcAVprw/DgUzEm9cF562HM52tv13Fw==',
       'qxlnPRrjUzMDF/grTw7EMvUWIvGTACN5VAqt31tLm38='
     );
     -- End create test user
@@ -184,7 +184,7 @@ BEGIN
     -- Link the user to the event
     INSERT INTO event_admins (fk_user_id, fk_event_id)
     VALUES(
-      'cd7bc650-2e71-11e5-a390-675459d99309', 'cd7bc650-2e71-11e5-a390-675459d99309'
+      'cd7bc650-2e71-11e5-a390-675459b99309', 'cd7bc650-2e71-11e5-a390-675459d99309'
     );
     -- End linking the user
 
