@@ -145,3 +145,24 @@ type SeatingRequestChoice struct {
 	FirstName          string `json:"first_name"`
 	LastName           string `json:"last_name"`
 }
+
+// User represents a user of the part of the application which requires
+// authentication.
+type User struct {
+	UserID    string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"user_id"`
+	Email     string    `json:"email"`
+	FirstName string    `sql:"-" json:"first_name"`
+	LastName  string    `sql:"-" json:"last_name"`
+	CreatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"-"`
+}
+
+// UserLogin holds the details necessary to authenticate a user with the system.
+type UserLogin struct {
+	UserLoginID string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"-"`
+	FkUserID    string    `json:"-"`
+	Salt        string    `json:"-"`
+	Password    string    `json:"-"`
+	CreatedAt   time.Time `json:"-"`
+	UpdatedAt   time.Time `json:"-"`
+}

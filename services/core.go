@@ -23,12 +23,14 @@ var key = os.Getenv("ENC_KEY")
 type Coordinator struct {
 	events   eventsService
 	invitees inviteeService
+	auth     authService
 }
 
 func NewCoordinator(newDa dal.DataHandler) Coordinator {
 	return Coordinator{
 		events:   newEventsService(newDa),
 		invitees: newInviteeService(newDa),
+		auth:     newAuthService(newDa),
 	}
 }
 
@@ -316,4 +318,18 @@ func (c Coordinator) decryptInviteeSeatingRequest(request entities.InviteeSeatin
 	return request, nil
 }
 
-//end invitee coordination
+// end invitee coordination
+
+// auth coordination
+
+// Login will authenticate login credentials from the lUser object
+func (c Coordinator) Login(lUser LoginUser) (string, utils.Error) {
+	return c.auth.Login(lUser)
+}
+
+// GenerateToken will generate a new token for the provided user id
+func (c Coordinator) GenerateToken(userID string) (string, utils.Error) {
+	return c.auth.GenerateToken(userID);
+}
+
+// end auth coordination
