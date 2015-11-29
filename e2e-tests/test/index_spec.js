@@ -7,7 +7,8 @@ import {
   validJWT,
   validJWTWithInvalidUser,
   validateAndCleanMenuChoicesUUIDs,
-  validateAndCleanUUID
+  validateAndCleanUUID,
+  validateAndCleanSeatingRequestUUIDs
 } from '../helpers';
 
 let api = supertest(`http://localhost:${process.env.PORT}/api/v1`);
@@ -248,12 +249,7 @@ describe('events', () => {
                 return friend;
               });
 
-              item.seating_request = item.seating_request.map((request) => {
-                request.invitee_seating_request_id = validateAndCleanUUID(request.invitee_seating_request_id);
-                request.invitee_request_id = validateAndCleanUUID(request.invitee_request_id);
-
-                return request;
-              });
+              item.seating_request = validateAndCleanSeatingRequestUUIDs(item.seating_request, true);
 
               return item;
             });
@@ -315,7 +311,14 @@ describe('events', () => {
                   }
                 }
               ],
-              "seating_request": []
+              "seating_request": [
+                {
+                  "first_name": "Soldier",
+                  "last_name": "",
+                  "invitee_request_id": "FIXED_ID",
+                  "invitee_seating_request_id": "FIXED_ID",
+                }
+              ]
             },
             {
               "invitee_id": "fb3c11f8-7917-11e5-8b8e-b3a0b1b9b078",
@@ -436,6 +439,9 @@ describe('invitees', () => {
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', 'application/json')
+        .expect((res) => {
+          res.body.seating_request = validateAndCleanSeatingRequestUUIDs(res.body.seating_request, false);
+        })
         .expect(
           {
             invitee_id: "fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068",
@@ -493,7 +499,14 @@ describe('invitees', () => {
                 }
               }
             ],
-            seating_request: []
+            seating_request: [
+              {
+                "first_name": "Soldier",
+                "last_name": "",
+                "invitee_request_id": "FIXED_ID",
+                "invitee_seating_request_id": "FIXED_ID",
+              }
+            ]
           },
         done);
       });

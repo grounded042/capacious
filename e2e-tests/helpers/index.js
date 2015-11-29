@@ -82,3 +82,26 @@ export function validateAndCleanMenuChoicesUUIDs(choices) {
     return choice;
   });
 }
+
+/**
+ * given invitee seating requests, check that the invitee_seating_request_id
+ * attributes is a valid UUIDs and the invitee_request_id is an encrypted (not
+ * a UUID) string and then sets them to 'FIXED_ID' to aid in testing dynamic ids
+ * setting allUUID to true does not check for the encrypted string
+ * @param  {array} requests - the array of requests to validate and clean
+ * @param  {array} allUUID - don't check for an encrypted UUID
+ * @return {array} the cleaned and validated array of requests
+ */
+export function validateAndCleanSeatingRequestUUIDs(requests, allUUID) {
+  return requests.map((request) => {
+    request.invitee_seating_request_id = validateAndCleanUUID(request.invitee_seating_request_id);
+
+    if (isStringValidUUID(request.invitee_request_id) && !allUUID) {
+      throw new Error("invitee_request_id is a valid UUID which means it has not been encrypted!");
+    }
+
+    request.invitee_request_id = "FIXED_ID";
+
+    return request;
+  });
+}
