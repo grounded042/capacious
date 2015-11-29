@@ -48,8 +48,21 @@ func (dh DataHandler) GetEventInfo(eventID string) (entities.Event, error) {
 	return event, db.Error
 }
 
-func (dh DataHandler) CreateEvent(createMe *entities.Event) error {
-	db := dh.conn.Debug().Create(&createMe)
+// CreateEvent creates an event and adds the userID as an owner of the created
+// event.
+//
+// sooo... technically, we might want to check at some level that the userID
+// is a valid user id, but we should NEVER be inserting a bad ID since if we
+// are inserting a userID that doesn't exist it means our auth system has been
+// compromised. At that point we have bigger problems.
+func (dh DataHandler) CreateEvent(createMe *entities.Event, userID string) error {
+	db := dh.conn.Create(&createMe)
+
+	if db.Error != nil {
+		return db.Error
+	}
+
+	db.Create(&entities.EventAdmin{FkUserID: userID, FkEventID: createMe.EventID})
 
 	return db.Error
 }

@@ -9,9 +9,9 @@ type eventsGateway interface {
 	// GetAllEvents gets all of the events in the db that the passed in userID is
 	// an admin of.
 	GetAllEvents(userID string) ([]entities.Event, error)
-	// CreateEvent creates an event from a supplied
-	// event object
-	CreateEvent(*entities.Event) error
+	// CreateEvent creates an event from a supplied event object and adds the
+	// specified user id as an owner of the event
+	CreateEvent(*entities.Event, string) error
 	// GetEventInfo gets the info for an event matching
 	// the supplied event id
 	GetEventInfo(eventId string) (entities.Event, error)
@@ -50,8 +50,8 @@ func (es eventsService) GetEventInfo(eventId string) (entities.Event, utils.Erro
 	return event, nil
 }
 
-func (es eventsService) CreateEvent(event *entities.Event) utils.Error {
-	err := es.da.CreateEvent(event)
+func (es eventsService) CreateEvent(event *entities.Event, userID string) utils.Error {
+	err := es.da.CreateEvent(event, userID)
 
 	if err != nil {
 		return utils.NewApiError(500, err.Error())

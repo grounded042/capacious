@@ -24,14 +24,14 @@ func NewControllersList(coord services.Coordinator) List {
 
 // checkForAndHandleUserIDInContext checks for the UserID variable in the
 // context c. If there is a user id in the context, it returns the user id along
-// with true. If there is not, it writes the status 401 and a message to the
-// http.ResponseWriter w and returns an empty string and false.
-func checkForAndHandleUserIDInContext(c web.C, w http.ResponseWriter) (string, bool) {
+// with true. If there is not, it writes the status 401, the provided mesaage to
+// the http.ResponseWriter w, returns an empty string, and false.
+func checkForAndHandleUserIDInContext(c web.C, w http.ResponseWriter, message string) (string, bool) {
 	userID, ok := c.Env["UserID"].(string)
 
 	if !ok || userID == "" {
 		w.WriteHeader(401)
-		json.NewEncoder(w).Encode("You need a valid user id to get your list of events!")
+		json.NewEncoder(w).Encode(message)
 		return "", false
 	}
 

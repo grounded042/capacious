@@ -45,8 +45,8 @@ func (c Coordinator) GetEventInfo(eventId string) (entities.Event, utils.Error) 
 	return c.events.GetEventInfo(eventId)
 }
 
-func (c Coordinator) CreateEvent(event *entities.Event) utils.Error {
-	return c.events.CreateEvent(event)
+func (c Coordinator) CreateEvent(event *entities.Event, userID string) utils.Error {
+	return c.events.CreateEvent(event, userID)
 }
 
 func (c Coordinator) GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, utils.Error) {
