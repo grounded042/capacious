@@ -32,10 +32,10 @@ func NewDal() DataHandler {
 	return DataHandler{conn: &db}
 }
 
-func (dh DataHandler) GetAllEvents() ([]entities.Event, error) {
+func (dh DataHandler) GetAllEvents(userID string) ([]entities.Event, error) {
 	var events = []entities.Event{}
 
-	db := dh.conn.Find(&events)
+	db := dh.conn.Table("event_admins").Select("events.*").Where("fk_user_id = ?", userID).Joins("left join events on event_admins.fk_event_id = events.event_id").Find(&events)
 
 	return events, db.Error
 }

@@ -12,7 +12,7 @@ import (
 )
 
 type EventsStub interface {
-	GetEvents() ([]entities.Event, utils.Error)
+	GetEvents(string) ([]entities.Event, utils.Error)
 	GetEventInfo(eventId string) (entities.Event, utils.Error)
 	CreateEvent(*entities.Event) utils.Error
 	GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, utils.Error)
@@ -30,8 +30,13 @@ func NewEventsController(newEs EventsStub) EventsController {
 }
 
 func (ec EventsController) GetEvents(c web.C, w http.ResponseWriter, r *http.Request) {
+	userID, ok := checkForAndHandleUserIDInContext(c, w)
 
-	if events, err := ec.es.GetEvents(); err != nil {
+	if !ok {
+		return
+	}
+
+	if events, err := ec.es.GetEvents(userID); err != nil {
 		w.WriteHeader(500)
 		fmt.Println(err)
 	} else {
@@ -40,6 +45,8 @@ func (ec EventsController) GetEvents(c web.C, w http.ResponseWriter, r *http.Req
 	}
 }
 
+// GetEventInfo gets the info for a specific event. This function does not
+// require auth as it is used to get event info for responses to invitations
 func (ec EventsController) GetEventInfo(c web.C, w http.ResponseWriter, r *http.Request) {
 
 	if event, err := ec.es.GetEventInfo(c.URLParams["id"]); err != nil {

@@ -6,11 +6,9 @@ import (
 )
 
 type eventsGateway interface {
-	// GetAllEvents gets all of the events in the db
-	// TODO: This will need to change eventually since
-	// we will want to lockdown which events you can
-	// get bases on your user id
-	GetAllEvents() ([]entities.Event, error)
+	// GetAllEvents gets all of the events in the db that the passed in userID is
+	// an admin of.
+	GetAllEvents(userID string) ([]entities.Event, error)
 	// CreateEvent creates an event from a supplied
 	// event object
 	CreateEvent(*entities.Event) error
@@ -32,8 +30,8 @@ func newEventsService(newDa eventsGateway) eventsService {
 	}
 }
 
-func (es eventsService) GetEvents() ([]entities.Event, utils.Error) {
-	events, err := es.da.GetAllEvents()
+func (es eventsService) GetEvents(userID string) ([]entities.Event, utils.Error) {
+	events, err := es.da.GetAllEvents(userID)
 
 	if err != nil {
 		return []entities.Event{}, utils.NewApiError(500, err.Error())

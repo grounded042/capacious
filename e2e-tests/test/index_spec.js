@@ -3,10 +3,13 @@ import supertest from 'supertest';
 
 import {
   isStringValidUUID as validUUID,
-  isDateLessThanASecondOld as validDate
+  isDateLessThanASecondOld as validDate,
+  validJWT,
+  validJWTWithInvalidUser
 } from '../helpers';
 
 let api = supertest(`http://localhost:${process.env.PORT}/api/v1`);
+let secret = String(process.env.GO_JWT_MIDDLEWARE_KEY);
 
 describe('events', () => {
   let working_event_id = "cd7bc650-2e71-11e5-a390-675459d99309";
@@ -63,8 +66,8 @@ describe('events', () => {
     });
   });
 
-  describe('getting', () => {
-    describe('with a valid id', () => {
+  describe('getting one', () => {
+    describe('with a valid event id', () => {
       it('should return a specific object', (done) => {
         api.get('/events/' + working_event_id)
         .set('Accept', 'application/json')
@@ -83,7 +86,7 @@ describe('events', () => {
       });
     });
 
-    describe('with an invalid id', () => {
+    describe('with an invalid event id', () => {
       it('should return a 404', (done) => {
         api.get('/events/cd7bc650-2e71-11e5-a390-675459d99308')
         .set('Accept', 'application/json')
@@ -201,6 +204,48 @@ describe('events', () => {
           .set('Accept', 'application/json')
           .expect(404, done);
         });
+      });
+    });
+  });
+
+  describe('getting all', () => {
+    describe('with a valid JWT', () => {
+      it('should return 200 and a list of events assigned to the user in the JWT', (done) => {
+        api.get('/events')
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${validJWT(secret)}`)
+        .expect([
+          {
+            event_id: "cd7bc650-2e71-11e5-a390-675459d99309",
+            name: "Picnic",
+            description: "Your normal picnic.",
+            location: "The Park",
+            start_time: "2015-12-15T17:00:00Z",
+            end_time: "2015-12-15T22:00:00Z",
+            respond_by: "2015-12-05T22:00:00Z",
+            allowed_friends: 2
+          }
+        ])
+        .expect(200, done);
+      });
+
+      describe('with a user id that does not have any events', () => {
+        it('should return an empty array', (done) => {
+          api.get('/events')
+          .set('Accept', 'application/json')
+          .set('Authorization', `Bearer ${validJWTWithInvalidUser(secret)}`)
+          .expect([])
+          .expect(200, done);
+        });
+      });
+    });
+
+    describe('without a JWT', () => {
+      it('should return an error and a 401', (done) => {
+        api.get('/events')
+        .set('Accept', 'application/json')
+        .expect('"You need a valid user id to get your list of events!"\n')
+        .expect(401, done);
       });
     });
   });
