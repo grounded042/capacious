@@ -52,3 +52,33 @@ export function validJWTWithInvalidUser(secret) {
     expiresIn: "2 days",
   });
 }
+
+/**
+ * given a uuid, validate that it is indeed a UUID and then pass back a string
+ * to replace it. Throw an error if it's not a valid UUID
+ * @param  {string} uuid - the UUID to validate
+ * @return {string} the fixed string to assign to replaced UUIDs
+ */
+export function validateAndCleanUUID(uuid) {
+  if (!isStringValidUUID(uuid)) {
+    throw new Error("not a valid uuid")
+  }
+
+  return 'FIXED_ID';
+}
+
+/**
+ * given menu item choices, check that the attributes are valid UUIDs and then
+ * set them to 'FIXED_ID' to aid in testing dynamic ids
+ * @param  {array} choices - the array of choices to validate and clean
+ * @return {array} the cleaned and validated array of choices
+ */
+export function validateAndCleanMenuChoicesUUIDs(choices) {
+  return choices.map((choice) => {
+    choice.menu_choice_id = validateAndCleanUUID(choice.menu_choice_id);
+    choice.menu_item_id = validateAndCleanUUID(choice.menu_item_id);
+    choice.menu_item_option_id = validateAndCleanUUID(choice.menu_item_option_id);
+
+    return choice;
+  });
+}

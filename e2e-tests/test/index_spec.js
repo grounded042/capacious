@@ -5,7 +5,9 @@ import {
   isStringValidUUID as validUUID,
   isDateLessThanASecondOld as validDate,
   validJWT,
-  validJWTWithInvalidUser
+  validJWTWithInvalidUser,
+  validateAndCleanMenuChoicesUUIDs,
+  validateAndCleanUUID
 } from '../helpers';
 
 let api = supertest(`http://localhost:${process.env.PORT}/api/v1`);
@@ -221,6 +223,114 @@ describe('events', () => {
           .set('Accept', 'application/json')
           .expect(404, done);
         });
+      });
+    });
+  });
+
+  describe('getting event invitees', () => {
+    describe('with a valid event id', () => {
+      it('should return a specific object', (done) => {
+        api.get(`/events/${working_event_id}/relationships/invitees`)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', 'application/json')
+        .expect((res) => {
+          res.body = res.body.map((item) => {
+            // take care of menu choices
+            item.self.menu_choices = validateAndCleanMenuChoicesUUIDs(item.self.menu_choices);
+
+            item.friends = item.friends.map((friend) => {
+              friend.invitee_friend_id = validateAndCleanUUID(friend.invitee_friend_id);
+              friend.self.guest_id = validateAndCleanUUID(friend.self.guest_id);
+              friend.self.menu_choices = validateAndCleanMenuChoicesUUIDs(friend.self.menu_choices);
+
+              return friend;
+            });
+
+            item.seating_request = item.seating_request.map((request) => {
+              request.invitee_seating_request_id = validateAndCleanUUID(request.invitee_seating_request_id);
+              request.invitee_request_id = validateAndCleanUUID(request.invitee_request_id);
+
+              return request;
+            });
+
+            return item;
+          });
+        })
+        .expect([
+          {
+            "invitee_id": "fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068",
+            "email": "shale@mann.co",
+            "self": {
+              "guest_id": "24669e54-5ee2-11e5-a379-7b2796b289b2",
+              "first_name": "Saxton",
+              "last_name": "Hale",
+              "attending": false,
+              "menu_choices": [
+                {
+                  "menu_choice_id": "FIXED_ID",
+                  "menu_item_id": "FIXED_ID",
+                  "menu_item_option_id": "FIXED_ID"
+                },
+                {
+                  "menu_choice_id": "FIXED_ID",
+                  "menu_item_id": "FIXED_ID",
+                  "menu_item_option_id": "FIXED_ID"
+                },
+                {
+                  "menu_choice_id": "FIXED_ID",
+                  "menu_item_id": "FIXED_ID",
+                  "menu_item_option_id": "FIXED_ID"
+                }
+              ],
+              "menu_note": "Could I have some wine with the cheese and crackers?"
+            },
+            "friends": [
+              {
+                "invitee_friend_id": "FIXED_ID",
+                "self": {
+                  "guest_id": "FIXED_ID",
+                  "first_name": "Helen",
+                  "last_name": "",
+                  "attending": false,
+                  "menu_choices": [
+                    {
+                      "menu_choice_id": "FIXED_ID",
+                      "menu_item_id": "FIXED_ID",
+                      "menu_item_option_id": "FIXED_ID"
+                    },
+                    {
+                      "menu_choice_id": "FIXED_ID",
+                      "menu_item_id": "FIXED_ID",
+                      "menu_item_option_id": "FIXED_ID"
+                    },
+                    {
+                      "menu_choice_id": "FIXED_ID",
+                      "menu_item_id": "FIXED_ID",
+                      "menu_item_option_id": "FIXED_ID"
+                    }
+                  ],
+                  "menu_note": ""
+                }
+              }
+            ],
+            "seating_request": []
+          },
+          {
+            "invitee_id": "fb3c11f8-7917-11e5-8b8e-b3a0b1b9b078",
+            "email": "soldier@mann.co",
+            "self": {
+              "guest_id": "81e6d338-7917-11e5-8b8e-a37beb0fdae8",
+              "first_name": "Soldier",
+              "last_name": "",
+              "attending": false,
+              "menu_choices": [],
+              "menu_note": ""
+            },
+            "friends": [],
+            "seating_request": []
+          }
+        ])
+        .expect(200, done);
       });
     });
   });
@@ -453,7 +563,7 @@ describe('invitees', () => {
       .send({
         self: {
           guest_id: "81e6d338-7917-11e5-8b8e-a37beb0fdab8",
-          first_name: "Friend",
+          first_name: "Helen 2",
           last_name: "",
           attending: false
         }
@@ -465,7 +575,7 @@ describe('invitees', () => {
           invitee_friend_id: "e6afb5b0-7b64-11e5-b861-1f0fc9657754",
           self: {
             guest_id: "81e6d338-7917-11e5-8b8e-a37beb0fdab8",
-            first_name: "Friend",
+            first_name: "Helen 2",
             last_name: "",
             attending: false,
             menu_choices: null,
