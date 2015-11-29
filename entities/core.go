@@ -166,3 +166,12 @@ type UserLogin struct {
 	CreatedAt   time.Time `json:"-"`
 	UpdatedAt   time.Time `json:"-"`
 }
+
+// EventAdmin holds the db key of a user and an event they are an admin of
+type EventAdmin struct {
+	EventAdminID string    `gorm:"primary_key" sql:"DEFAULT:uuid_generate_v1mc()" json:"-"`
+	FkUserID     string    `json:"-"`
+	FkEventID    string    `json:"-"`
+	CreatedAt    time.Time `json:"-"`
+	UpdatedAt    time.Time `json:"-"`
+}

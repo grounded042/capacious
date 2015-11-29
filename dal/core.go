@@ -32,10 +32,10 @@ func NewDal() DataHandler {
 	return DataHandler{conn: &db}
 }
 
-func (dh DataHandler) GetAllEvents() ([]entities.Event, error) {
+func (dh DataHandler) GetAllEvents(userID string) ([]entities.Event, error) {
 	var events = []entities.Event{}
 
-	db := dh.conn.Find(&events)
+	db := dh.conn.Table("event_admins").Select("events.*").Where("fk_user_id = ?", userID).Joins("left join events on event_admins.fk_event_id = events.event_id").Find(&events)
 
 	return events, db.Error
 }
@@ -48,8 +48,21 @@ func (dh DataHandler) GetEventInfo(eventID string) (entities.Event, error) {
 	return event, db.Error
 }
 
-func (dh DataHandler) CreateEvent(createMe *entities.Event) error {
-	db := dh.conn.Debug().Create(&createMe)
+// CreateEvent creates an event and adds the userID as an owner of the created
+// event.
+//
+// sooo... technically, we might want to check at some level that the userID
+// is a valid user id, but we should NEVER be inserting a bad ID since if we
+// are inserting a userID that doesn't exist it means our auth system has been
+// compromised. At that point we have bigger problems.
+func (dh DataHandler) CreateEvent(createMe *entities.Event, userID string) error {
+	db := dh.conn.Create(&createMe)
+
+	if db.Error != nil {
+		return db.Error
+	}
+
+	db.Create(&entities.EventAdmin{FkUserID: userID, FkEventID: createMe.EventID})
 
 	return db.Error
 }

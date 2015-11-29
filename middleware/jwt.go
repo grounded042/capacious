@@ -61,7 +61,7 @@ func JWTMiddleware(c *web.C, h http.Handler) http.Handler {
 				}
 			} else if token.Valid {
 				// token is valid, set the user id so other things can use it
-				c.Env["UserId"] = token.Claims["sub"]
+				c.Env["UserID"] = token.Claims["sub"]
 				h.ServeHTTP(w, r)
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)

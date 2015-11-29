@@ -36,16 +36,17 @@ func NewCoordinator(newDa dal.DataHandler) Coordinator {
 
 // events coordination
 
-func (c Coordinator) GetEvents() ([]entities.Event, utils.Error) {
-	return c.events.GetEvents()
+// GetEvents gets all events that the specified userID is an admin of
+func (c Coordinator) GetEvents(userID string) ([]entities.Event, utils.Error) {
+	return c.events.GetEvents(userID)
 }
 
 func (c Coordinator) GetEventInfo(eventId string) (entities.Event, utils.Error) {
 	return c.events.GetEventInfo(eventId)
 }
 
-func (c Coordinator) CreateEvent(event *entities.Event) utils.Error {
-	return c.events.CreateEvent(event)
+func (c Coordinator) CreateEvent(event *entities.Event, userID string) utils.Error {
+	return c.events.CreateEvent(event, userID)
 }
 
 func (c Coordinator) GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, utils.Error) {
@@ -329,7 +330,7 @@ func (c Coordinator) Login(lUser LoginUser) (string, utils.Error) {
 
 // GenerateToken will generate a new token for the provided user id
 func (c Coordinator) GenerateToken(userID string) (string, utils.Error) {
-	return c.auth.GenerateToken(userID);
+	return c.auth.GenerateToken(userID)
 }
 
 // end auth coordination

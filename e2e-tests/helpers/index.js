@@ -1,5 +1,7 @@
 /** @module capacious-e2e-helper */
 
+import jwt from 'jsonwebtoken';
+
 /** The name of the module. */
 export const name = 'capacious-e2e-helper';
 
@@ -25,4 +27,28 @@ export function isDateLessThanASecondOld(date) {
   let compare_me = new Date(date);
 
   return (compare_me > before_now && compare_me < now);
+}
+
+/**
+ * get a JWT that is valid both in structure and in content
+ * @param  {string} secret - the secret to use in the JWT
+ * @return {string} valid JWT with legit user id
+ */
+export function validJWT(secret) {
+  return jwt.sign({ sub: "cd7bc650-2e71-11e5-a390-675459b99309" }, secret, {
+    algorithm: "HS512",
+    expiresIn: "2 days",
+  });
+}
+
+/**
+ * get a JWT that is valid in structure, but the user id inside is not valid
+ * @param  {string} secret - the secret to use in the JWT
+ * @return {string} valid JWT with an invalid user id
+ */
+export function validJWTWithInvalidUser(secret) {
+  return jwt.sign({ sub: "81e6d338-7917-11e5-8b8e-a37beb0fdae8" }, secret, {
+    algorithm: "HS512",
+    expiresIn: "2 days",
+  });
 }
