@@ -51,7 +51,7 @@ func (ac AuthController) Login(c web.C, w http.ResponseWriter, r *http.Request) 
 }
 
 func (ac AuthController) RefreshToken(c web.C, w http.ResponseWriter, r *http.Request) {
-	userId, ok := c.Env["UserId"].(string)
+	userId, ok := c.Env["UserID"].(string)
 	if !ok || userId == "" {
 		w.WriteHeader(401)
 		w.Write([]byte("You need a valid user id to refresh your token!"))
