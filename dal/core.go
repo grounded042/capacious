@@ -70,22 +70,35 @@ func (dh DataHandler) CreateEvent(createMe *entities.Event, userID string) error
 func (dh DataHandler) GetAllInviteesForEvent(eventId string) ([]entities.Invitee, error) {
 	var invitees = []entities.Invitee{}
 
-	db := dh.conn.Where("fk_event_id = ?", eventId).Find(&invitees)
+	rows, err := dh.conn.Debug().Table("invitees").Select("invitee_id, fk_event_id, fk_guest_id, email, invitees.created_at, invitees.updated_at, guest_id, first_name, last_name, attending, guests.created_at, guests.updated_at").Joins("left join guests on guests.guest_id = invitees.fk_guest_id").Where("fk_event_id = ?", eventId).Rows()
+	defer rows.Close()
 
-	if db.Error != nil {
-		return []entities.Invitee{}, db.Error
+	if err != nil {
+		return []entities.Invitee{}, err
 	}
 
-	invitees, db.Error = dh.addInviteeSelfToInvitees(invitees)
+	for rows.Next() {
+		var invitee = entities.Invitee{}
 
-	if db.Error != nil {
-		return []entities.Invitee{}, db.Error
+		sErr := rows.Scan(&invitee.InviteeID, &invitee.FkEventID, &invitee.FkGuestID, &invitee.Email, &invitee.CreatedAt, &invitee.UpdatedAt, &invitee.Self.GuestID, &invitee.Self.FirstName, &invitee.Self.LastName, &invitee.Self.Attending, &invitee.Self.CreatedAt, &invitee.Self.UpdatedAt)
+
+		if sErr != nil {
+			return []entities.Invitee{}, sErr
+		}
+
+		invitees = append(invitees, invitee)
 	}
 
-	invitees, db.Error = dh.addInviteeSeatingRequestsToInvitees(invitees)
+	err = rows.Err()
 
-	if db.Error != nil {
-		return []entities.Invitee{}, db.Error
+	if err != nil {
+		return []entities.Invitee{}, err
+	}
+
+	invitees, err = dh.addInviteeSeatingRequestsToInvitees(invitees)
+
+	if err != nil {
+		return []entities.Invitee{}, err
 	}
 
 	return dh.addInviteeFriendsToInvitees(invitees)
