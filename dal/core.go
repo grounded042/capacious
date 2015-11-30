@@ -662,3 +662,13 @@ func (dh DataHandler) GetUserLoginFromEmail(email string) (entities.UserLogin, e
 
 	return *findMe, db.Error
 }
+
+// GetEventAdminRecordForUserAndEventID gets the event admin record that
+// contains both the user id UserID and the event id EventID.
+func (dh DataHandler) GetEventAdminRecordForUserAndEventID(userID string, eventID string) (entities.EventAdmin, error) {
+	var eAdmin entities.EventAdmin
+
+	db := dh.conn.Where("fk_user_id = ? and fk_event_id = ?", userID, eventID).Find(&eAdmin)
+
+	return eAdmin, db.Error
+}

@@ -12,7 +12,7 @@ import (
 )
 
 type InviteeStub interface {
-	GetInviteesForEvent(string) ([]entities.Invitee, utils.Error)
+	GetInviteesForEvent(string, string) ([]entities.Invitee, utils.Error)
 	CreateInviteeForEvent(*entities.Invitee, entities.Event) utils.Error
 	GetInviteeFromID(string) (entities.Invitee, utils.Error)
 	EditInvitee(entities.Invitee) utils.Error
@@ -36,11 +36,17 @@ func NewInviteesController(newIs InviteeStub) InviteesController {
 }
 
 func (ec InviteesController) GetInviteesForEvent(c web.C, w http.ResponseWriter, r *http.Request) {
-	invitees, err := ec.is.GetInviteesForEvent(c.URLParams["id"])
+	userID, ok := checkForAndHandleUserIDInContext(c, w, "You need a valid user id to get a list of invitees for an event!")
+
+	if !ok {
+		return
+	}
+
+	invitees, err := ec.is.GetInviteesForEvent(c.URLParams["id"], userID)
 
 	if err != nil {
-		w.WriteHeader(500)
-		fmt.Println(err.Error())
+		w.WriteHeader(err.Code())
+		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
 

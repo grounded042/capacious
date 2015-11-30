@@ -109,5 +109,6 @@ CREATE TABLE IF NOT EXISTS event_admins (
   fk_user_id uuid REFERENCES users (user_id),
   fk_event_id uuid REFERENCES events (event_id),
   created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp
+  updated_at timestamp default current_timestamp,
+  UNIQUE (fk_user_id, fk_event_id)
 );

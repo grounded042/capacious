@@ -100,6 +100,7 @@ BEGIN
       '81e6d338-7917-11e5-8b8e-a37beb0fdab8'
     );
 
+    -- create another invitee without a friend
     INSERT INTO guests(guest_id, first_name, last_name, attending)
     VALUES (
       '81e6d338-7917-11e5-8b8e-a37beb0fdae8', 'Soldier', '', FALSE
@@ -109,6 +110,12 @@ BEGIN
     VALUES (
       'fb3c11f8-7917-11e5-8b8e-b3a0b1b9b078', 'cd7bc650-2e71-11e5-a390-675459d99309',
       '81e6d338-7917-11e5-8b8e-a37beb0fdae8', 'soldier@mann.co'
+    );
+
+    -- add the new invitee as a seat request for the first one
+    INSERT INTO invitee_seating_requests(fk_invitee_id, fk_invitee_request_id)
+    VALUES (
+      'fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068', 'fb3c11f8-7917-11e5-8b8e-b3a0b1b9b078'
     );
 
     -- set menu choices for the created invitee and friend

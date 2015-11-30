@@ -52,3 +52,56 @@ export function validJWTWithInvalidUser(secret) {
     expiresIn: "2 days",
   });
 }
+
+/**
+ * given a uuid, validate that it is indeed a UUID and then pass back a string
+ * to replace it. Throw an error if it's not a valid UUID
+ * @param  {string} uuid - the UUID to validate
+ * @return {string} the fixed string to assign to replaced UUIDs
+ */
+export function validateAndCleanUUID(uuid) {
+  if (!isStringValidUUID(uuid)) {
+    throw new Error("not a valid uuid")
+  }
+
+  return 'FIXED_ID';
+}
+
+/**
+ * given menu item choices, check that the attributes are valid UUIDs and then
+ * set them to 'FIXED_ID' to aid in testing dynamic ids
+ * @param  {array} choices - the array of choices to validate and clean
+ * @return {array} the cleaned and validated array of choices
+ */
+export function validateAndCleanMenuChoicesUUIDs(choices) {
+  return choices.map((choice) => {
+    choice.menu_choice_id = validateAndCleanUUID(choice.menu_choice_id);
+    choice.menu_item_id = validateAndCleanUUID(choice.menu_item_id);
+    choice.menu_item_option_id = validateAndCleanUUID(choice.menu_item_option_id);
+
+    return choice;
+  });
+}
+
+/**
+ * given invitee seating requests, check that the invitee_seating_request_id
+ * attributes is a valid UUIDs and the invitee_request_id is an encrypted (not
+ * a UUID) string and then sets them to 'FIXED_ID' to aid in testing dynamic ids
+ * setting allUUID to true does not check for the encrypted string
+ * @param  {array} requests - the array of requests to validate and clean
+ * @param  {array} allUUID - don't check for an encrypted UUID
+ * @return {array} the cleaned and validated array of requests
+ */
+export function validateAndCleanSeatingRequestUUIDs(requests, allUUID) {
+  return requests.map((request) => {
+    request.invitee_seating_request_id = validateAndCleanUUID(request.invitee_seating_request_id);
+
+    if (isStringValidUUID(request.invitee_request_id) && !allUUID) {
+      throw new Error("invitee_request_id is a valid UUID which means it has not been encrypted!");
+    }
+
+    request.invitee_request_id = "FIXED_ID";
+
+    return request;
+  });
+}
