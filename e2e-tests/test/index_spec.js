@@ -5,7 +5,10 @@ import {
   isStringValidUUID as validUUID,
   isDateLessThanASecondOld as validDate,
   validJWT,
-  validJWTWithInvalidUser
+  validJWTWithInvalidUser,
+  validateAndCleanMenuChoicesUUIDs,
+  validateAndCleanUUID,
+  validateAndCleanSeatingRequestUUIDs
 } from '../helpers';
 
 let api = supertest(`http://localhost:${process.env.PORT}/api/v1`);
@@ -225,6 +228,139 @@ describe('events', () => {
     });
   });
 
+  describe('getting event invitees', () => {
+    describe('with a valid event id', () => {
+      describe('with a valid JWT', () => {
+        it('should return a specific object', (done) => {
+          api.get(`/events/${working_event_id}/relationships/invitees`)
+          .set('Accept', 'application/json')
+          .set('Authorization', `Bearer ${validJWT(secret)}`)
+          .expect('Content-Type', 'application/json')
+          .expect((res) => {
+            res.body = res.body.map((item) => {
+              // take care of menu choices
+              item.self.menu_choices = validateAndCleanMenuChoicesUUIDs(item.self.menu_choices);
+
+              item.friends = item.friends.map((friend) => {
+                friend.invitee_friend_id = validateAndCleanUUID(friend.invitee_friend_id);
+                friend.self.guest_id = validateAndCleanUUID(friend.self.guest_id);
+                friend.self.menu_choices = validateAndCleanMenuChoicesUUIDs(friend.self.menu_choices);
+
+                return friend;
+              });
+
+              item.seating_request = validateAndCleanSeatingRequestUUIDs(item.seating_request, true);
+
+              return item;
+            });
+          })
+          .expect([
+            {
+              "invitee_id": "fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068",
+              "email": "shale@mann.co",
+              "self": {
+                "guest_id": "24669e54-5ee2-11e5-a379-7b2796b289b2",
+                "first_name": "Saxton",
+                "last_name": "Hale",
+                "attending": false,
+                "menu_choices": [
+                  {
+                    "menu_choice_id": "FIXED_ID",
+                    "menu_item_id": "FIXED_ID",
+                    "menu_item_option_id": "FIXED_ID"
+                  },
+                  {
+                    "menu_choice_id": "FIXED_ID",
+                    "menu_item_id": "FIXED_ID",
+                    "menu_item_option_id": "FIXED_ID"
+                  },
+                  {
+                    "menu_choice_id": "FIXED_ID",
+                    "menu_item_id": "FIXED_ID",
+                    "menu_item_option_id": "FIXED_ID"
+                  }
+                ],
+                "menu_note": "Could I have some wine with the cheese and crackers?"
+              },
+              "friends": [
+                {
+                  "invitee_friend_id": "FIXED_ID",
+                  "self": {
+                    "guest_id": "FIXED_ID",
+                    "first_name": "Helen",
+                    "last_name": "",
+                    "attending": false,
+                    "menu_choices": [
+                      {
+                        "menu_choice_id": "FIXED_ID",
+                        "menu_item_id": "FIXED_ID",
+                        "menu_item_option_id": "FIXED_ID"
+                      },
+                      {
+                        "menu_choice_id": "FIXED_ID",
+                        "menu_item_id": "FIXED_ID",
+                        "menu_item_option_id": "FIXED_ID"
+                      },
+                      {
+                        "menu_choice_id": "FIXED_ID",
+                        "menu_item_id": "FIXED_ID",
+                        "menu_item_option_id": "FIXED_ID"
+                      }
+                    ],
+                    "menu_note": ""
+                  }
+                }
+              ],
+              "seating_request": [
+                {
+                  "first_name": "Soldier",
+                  "last_name": "",
+                  "invitee_request_id": "FIXED_ID",
+                  "invitee_seating_request_id": "FIXED_ID",
+                }
+              ]
+            },
+            {
+              "invitee_id": "fb3c11f8-7917-11e5-8b8e-b3a0b1b9b078",
+              "email": "soldier@mann.co",
+              "self": {
+                "guest_id": "81e6d338-7917-11e5-8b8e-a37beb0fdae8",
+                "first_name": "Soldier",
+                "last_name": "",
+                "attending": false,
+                "menu_choices": [],
+                "menu_note": ""
+              },
+              "friends": [],
+              "seating_request": []
+            }
+          ])
+          .expect(200, done);
+        });
+
+        describe('but user is not an admin of this event', () => {
+          it('should return a specific error and a 403', (done) => {
+            api.get(`/events/${working_event_id}/relationships/invitees`)
+            .set('Accept', 'application/json')
+            .set('Authorization', `Bearer ${validJWTWithInvalidUser(secret)}`)
+            .expect('"You are not authorized to view the list of invitees for this event!"\n')
+            .expect(403, done);
+          });
+        });
+      });
+
+      describe('without a JWT', () => {
+        it('should return a specific error and a 401', (done) => {
+          api.get(`/events/${working_event_id}/relationships/invitees`)
+          .set('Accept', 'application/json')
+          .expect('Content-Type', 'application/json')
+          .expect('"You need a valid user id to get a list of invitees for an event!"\n')
+          .expect(401, done);
+        });
+      });
+    });
+  });
+
   describe('getting all', () => {
     describe('with a valid JWT', () => {
       it('should return 200 and a list of events assigned to the user in the JWT', (done) => {
@@ -303,6 +439,9 @@ describe('invitees', () => {
         .set('Accept', 'application/json')
         .expect(200)
         .expect('Content-Type', 'application/json')
+        .expect((res) => {
+          res.body.seating_request = validateAndCleanSeatingRequestUUIDs(res.body.seating_request, false);
+        })
         .expect(
           {
             invitee_id: "fb3c11f8-7917-11e5-8b8e-b3a0b1b9b068",
@@ -360,7 +499,14 @@ describe('invitees', () => {
                 }
               }
             ],
-            seating_request: []
+            seating_request: [
+              {
+                "first_name": "Soldier",
+                "last_name": "",
+                "invitee_request_id": "FIXED_ID",
+                "invitee_seating_request_id": "FIXED_ID",
+              }
+            ]
           },
         done);
       });
@@ -453,7 +599,7 @@ describe('invitees', () => {
       .send({
         self: {
           guest_id: "81e6d338-7917-11e5-8b8e-a37beb0fdab8",
-          first_name: "Friend",
+          first_name: "Helen 2",
           last_name: "",
           attending: false
         }
@@ -465,7 +611,7 @@ describe('invitees', () => {
           invitee_friend_id: "e6afb5b0-7b64-11e5-b861-1f0fc9657754",
           self: {
             guest_id: "81e6d338-7917-11e5-8b8e-a37beb0fdab8",
-            first_name: "Friend",
+            first_name: "Helen 2",
             last_name: "",
             attending: false,
             menu_choices: null,

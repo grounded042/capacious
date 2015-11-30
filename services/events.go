@@ -18,6 +18,9 @@ type eventsGateway interface {
 	// GetMenuItemsForEvent gets all of the menu items
 	// for an event matching the supplied event id
 	GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, error)
+	// GetEventAdminRecordForUserAndEventID gets the event admin record that
+	// contains both the user id UserID and the event id EventID.
+	GetEventAdminRecordForUserAndEventID(userID string, eventID string) (entities.EventAdmin, error)
 }
 
 type eventsService struct {
@@ -70,4 +73,14 @@ func (es eventsService) GetMenuItemsForEvent(eventID string) ([]entities.MenuIte
 	}
 
 	return items, nil
+}
+
+func (es eventsService) IsUserAnAdminForEvent(userID string, eventID string) (bool, utils.Error) {
+	eAdmin, err := es.da.GetEventAdminRecordForUserAndEventID(userID, eventID)
+
+	if err != nil && err.Error() != "record not found" {
+		return false, utils.NewApiError(500, err.Error())
+	}
+
+	return eAdmin.EventAdminID != "", nil
 }
