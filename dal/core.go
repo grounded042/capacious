@@ -1,13 +1,14 @@
 package dal
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
 
 	"github.com/grounded042/capacious/entities"
 	"github.com/jinzhu/gorm"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 type DataHandler struct {
@@ -70,24 +71,152 @@ func (dh DataHandler) CreateEvent(createMe *entities.Event, userID string) error
 func (dh DataHandler) GetAllInviteesForEvent(eventId string) ([]entities.Invitee, error) {
 	var invitees = []entities.Invitee{}
 
-	rows, err := dh.conn.Debug().Table("invitees").Select("invitee_id, fk_event_id, fk_guest_id, email, invitees.created_at, invitees.updated_at, guest_id, first_name, last_name, attending, guests.created_at, guests.updated_at").Joins("left join guests on guests.guest_id = invitees.fk_guest_id").Where("fk_event_id = ?", eventId).Rows()
+	query := `
+		SELECT
+	 		i.invitee_id,
+			i.fk_event_id,
+			i.fk_guest_id,
+			i.email,
+			i.created_at,
+			i.updated_at,
+			ig.guest_id,
+			ig.first_name,
+			ig.last_name,
+			ig.attending,
+			ig.created_at,
+			ig.updated_at,
+			ifs.invitee_friend_id,
+			ifs.fk_invitee_id,
+			ifs.created_at,
+			ifs.updated_at,
+			ifg.guest_id,
+			ifg.first_name,
+			ifg.last_name,
+			ifg.attending,
+			ifg.created_at,
+			ifg.updated_at
+			FROM invitees i
+			LEFT JOIN guests ig ON ig.guest_id = i.fk_guest_id
+			LEFT JOIN invitee_friends ifs ON ifs.fk_invitee_id = i.invitee_id
+			LEFT JOIN guests ifg ON ifs.fk_guest_id = ifg.guest_id
+			WHERE fk_event_id = ?`
+
+	// rows, err := dh.conn.Debug().Table("invitees").Select("invitee_id, fk_event_id, fk_guest_id, email, invitees.created_at, invitees.updated_at, guest_id, first_name, last_name, attending, guests.created_at, guests.updated_at, fk_menu_item_id, fk_menu_item_option_id").Joins("left join guests on guests.guest_id = invitees.fk_guest_id").Joins("left join menu_choices on menu_choices.fk_guest_id = guests.guest_id").Where("fk_event_id = ?", eventId).Rows()
+	rows, err := dh.conn.Raw(query, eventId).Rows()
 	defer rows.Close()
 
 	if err != nil {
 		return []entities.Invitee{}, err
 	}
 
-	for rows.Next() {
-		var invitee = entities.Invitee{}
+	var cInvitee = entities.Invitee{}
 
-		sErr := rows.Scan(&invitee.InviteeID, &invitee.FkEventID, &invitee.FkGuestID, &invitee.Email, &invitee.CreatedAt, &invitee.UpdatedAt, &invitee.Self.GuestID, &invitee.Self.FirstName, &invitee.Self.LastName, &invitee.Self.Attending, &invitee.Self.CreatedAt, &invitee.Self.UpdatedAt)
+	for rows.Next() {
+		var invitee = entities.Invitee{
+			Self: entities.Guest{
+				MenuChoices: []entities.MenuChoice{},
+			},
+			Friends:         []entities.InviteeFriend{},
+			SeatingRequests: []entities.InviteeSeatingRequest{},
+		}
+		var iFriend = entities.InviteeFriend{}
+
+		var ifID sql.NullString
+		var ifFkIID sql.NullString
+		var ifCA pq.NullTime
+		var ifUA pq.NullTime
+		var ifSGID sql.NullString
+		var ifSFN sql.NullString
+		var ifSLN sql.NullString
+		var ifSA sql.NullBool
+		var ifSCA pq.NullTime
+		var ifSUA pq.NullTime
+
+		sErr := rows.Scan(
+			// get the invitee - invitee will NEVER be null since we are querying off
+			// of it and doing a left join
+			&invitee.InviteeID,
+			&invitee.FkEventID,
+			&invitee.FkGuestID,
+			&invitee.Email,
+			&invitee.CreatedAt,
+			&invitee.UpdatedAt,
+			&invitee.Self.GuestID,
+			&invitee.Self.FirstName,
+			&invitee.Self.LastName,
+			&invitee.Self.Attending,
+			&invitee.Self.CreatedAt,
+			&invitee.Self.UpdatedAt,
+			// get the friend
+			&ifID,
+			&ifFkIID,
+			&ifCA,
+			&ifUA,
+			&ifSGID,
+			&ifSFN,
+			&ifSLN,
+			&ifSA,
+			&ifSCA,
+			&ifSUA)
+
+		iFriend.InviteeFriendID = ifID.String
+		iFriend.FkInviteeID = ifFkIID.String
+		iFriend.CreatedAt = ifCA.Time
+		iFriend.UpdatedAt = ifUA.Time
+		iFriend.Self.GuestID = ifSGID.String
+		iFriend.Self.FirstName = ifSFN.String
+		iFriend.Self.LastName = ifSLN.String
+		iFriend.Self.Attending = ifSA.Bool
+		iFriend.Self.CreatedAt = ifSCA.Time
+		iFriend.Self.UpdatedAt = ifSUA.Time
+
+		// is this the first invitee?
+		if cInvitee.InviteeID == "" {
+			// yes - set it to the current working invitee
+			cInvitee = invitee
+		}
+
+		// is the invitee we just got the one we are already working on?
+		if cInvitee.InviteeID != invitee.InviteeID {
+			// yes - we are done with the current working invitee. Add him to the
+			// official list and start on the next one
+
+			// first, get the menu info
+			cInvitee.Self, err = dh.addMenuInfoToGuestObj(cInvitee.Self)
+
+			if err != nil {
+				return []entities.Invitee{}, err
+			}
+
+			invitees = append(invitees, cInvitee)
+			cInvitee = invitee
+		} else {
+			// no - we are working on this currently, so let's add the friend and
+			// continue on
+
+			// first, get the menu info
+			iFriend.Self, err = dh.addMenuInfoToGuestObj(iFriend.Self)
+
+			if err != nil {
+				return []entities.Invitee{}, err
+			}
+
+			cInvitee.Friends = append(cInvitee.Friends, iFriend)
+		}
 
 		if sErr != nil {
 			return []entities.Invitee{}, sErr
 		}
-
-		invitees = append(invitees, invitee)
 	}
+
+	// finish off the last invitee from that query
+	cInvitee.Self, err = dh.addMenuInfoToGuestObj(cInvitee.Self)
+
+	if err != nil {
+		return []entities.Invitee{}, err
+	}
+
+	invitees = append(invitees, cInvitee)
 
 	err = rows.Err()
 
@@ -97,11 +226,12 @@ func (dh DataHandler) GetAllInviteesForEvent(eventId string) ([]entities.Invitee
 
 	invitees, err = dh.addInviteeSeatingRequestsToInvitees(invitees)
 
-	if err != nil {
-		return []entities.Invitee{}, err
-	}
+	// if err != nil {
+	// 	return []entities.Invitee{}, err
+	// }
 
-	return dh.addInviteeFriendsToInvitees(invitees)
+	// return dh.addInviteeFriendsToInvitees(invitees)
+	return invitees, err
 }
 
 func (dh DataHandler) addInviteeSelfToInvitees(list []entities.Invitee) ([]entities.Invitee, error) {
@@ -319,7 +449,6 @@ func (dh DataHandler) getInviteeFirstNameAndLastNameFromID(id string) (string, s
 
 func (dh DataHandler) getGuestFromID(id string) (entities.Guest, error) {
 	var guest entities.Guest
-	var err error
 
 	db := dh.conn.Where("guest_id = ?", id).First(&guest)
 
@@ -327,6 +456,12 @@ func (dh DataHandler) getGuestFromID(id string) (entities.Guest, error) {
 	if db.Error != nil {
 		return entities.Guest{}, db.Error
 	}
+
+	return dh.addMenuInfoToGuestObj(guest)
+}
+
+func (dh DataHandler) addMenuInfoToGuestObj(guest entities.Guest) (entities.Guest, error) {
+	var err error
 
 	guest.MenuChoices, err = dh.getMenuChoicesForGuestID(guest.GuestID)
 
