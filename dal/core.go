@@ -190,10 +190,9 @@ func (dh DataHandler) GetAllInviteesForEvent(eventId string) ([]entities.Invitee
 
 			invitees = append(invitees, cInvitee)
 			cInvitee = invitee
-		} else {
-			// no - we are working on this currently, so let's add the friend and
-			// continue on
+		}
 
+		if iFriend.InviteeFriendID != "" {
 			// first, get the menu info
 			iFriend.Self, err = dh.addMenuInfoToGuestObj(iFriend.Self)
 
