@@ -9,7 +9,7 @@ type inviteeGateway interface {
 	// GetAllInvitees gets all of the invitees in
 	// the db for a specified event.
 	// TODO: this will need to pagination at some point
-	GetAllInviteesForEvent(string) ([]entities.Invitee, error)
+	GetAllInviteesForEvent(string, int, int) ([]entities.Invitee, error)
 	// CreateInvitee creates an invitee from a supplied
 	// invitee object
 	CreateInvitee(*entities.Invitee) error
@@ -40,6 +40,9 @@ type inviteeGateway interface {
 	// GetSeatingRequestInviteesForEvent gets a list of invitees that only includes the needed info for
 	// seating requests
 	GetSeatingRequestInviteesForEvent(string) ([]entities.Invitee, error)
+	// GetNumberOfInviteesForEvent gets the number of invitees for the supplied
+	// event id
+	GetNumberOfInviteesForEvent(string) int
 }
 
 // the invitee is a subset of the event object -
@@ -53,8 +56,10 @@ func newInviteeService(newDa inviteeGateway) inviteeService {
 	}
 }
 
-func (is inviteeService) GetInviteesForEvent(eventId string) ([]entities.Invitee, utils.Error) {
-	invitees, err := is.da.GetAllInviteesForEvent(eventId)
+func (is inviteeService) GetInviteesForEvent(eventId string, p *PaginationService) ([]entities.Invitee, utils.Error) {
+	invitees, err := is.da.GetAllInviteesForEvent(eventId, p.GetStartNumber(), p.GetSize())
+
+	p.SetNumItems(is.da.GetNumberOfInviteesForEvent(eventId))
 
 	if err != nil {
 		return []entities.Invitee{}, utils.NewApiError(500, err.Error())

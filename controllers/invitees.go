@@ -5,14 +5,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/grounded042/capacious/entities"
+	"github.com/grounded042/capacious/services"
 	"github.com/grounded042/capacious/utils"
 	"github.com/zenazn/goji/web"
 )
 
 type InviteeStub interface {
-	GetInviteesForEvent(string, string) ([]entities.Invitee, utils.Error)
+	GetInviteesForEvent(string, string, *services.PaginationService) ([]entities.Invitee, utils.Error)
 	CreateInviteeForEvent(*entities.Invitee, entities.Event) utils.Error
 	GetInviteeFromID(string) (entities.Invitee, utils.Error)
 	EditInvitee(entities.Invitee) utils.Error
@@ -29,6 +31,18 @@ type InviteesController struct {
 	is InviteeStub
 }
 
+type DataWithPagination struct {
+	Data       interface{}    `json:"data"`
+	Pagination PaginationInfo `json:"pagination"`
+}
+
+type PaginationInfo struct {
+	TotalItems  int `json:"total_items"`
+	TotalPages  int `json:"total_pages"`
+	PageSize    int `json:"page_size"`
+	CurrentPage int `json:"current_page"`
+}
+
 func NewInviteesController(newIs InviteeStub) InviteesController {
 	return InviteesController{
 		is: newIs,
@@ -42,7 +56,17 @@ func (ec InviteesController) GetInviteesForEvent(c web.C, w http.ResponseWriter,
 		return
 	}
 
-	invitees, err := ec.is.GetInviteesForEvent(c.URLParams["id"], userID)
+	pagenumber, cErr := strconv.Atoi(r.URL.Query().Get("page[number]"))
+	utils.CheckErr(cErr, "Error parsing parameter 'page[number]' to int")
+
+	pagesize, cErr := strconv.Atoi(r.URL.Query().Get("page[size]"))
+	utils.CheckErr(cErr, "Error parsing parameter 'page[size]' to int")
+
+	p := services.NewPaginationService()
+	p.SetPageSize(pagesize)
+	p.SetPageNumber(pagenumber)
+
+	invitees, err := ec.is.GetInviteesForEvent(c.URLParams["id"], userID, &p)
 
 	if err != nil {
 		w.WriteHeader(err.Code())
@@ -50,8 +74,20 @@ func (ec InviteesController) GetInviteesForEvent(c web.C, w http.ResponseWriter,
 		return
 	}
 
+	pInfo := PaginationInfo{
+		TotalItems:  p.GetNumItems(),
+		TotalPages:  p.GetLast(),
+		PageSize:    p.GetSize(),
+		CurrentPage: p.GetCurrent(),
+	}
+
+	toSend := DataWithPagination{
+		Data:       invitees,
+		Pagination: pInfo,
+	}
+
 	w.WriteHeader(200)
-	json.NewEncoder(w).Encode(invitees)
+	json.NewEncoder(w).Encode(toSend)
 }
 
 func (ec InviteesController) CreateInviteeForEvent(c web.C, w http.ResponseWriter, r *http.Request) {
