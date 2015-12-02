@@ -67,6 +67,27 @@ func (dh DataHandler) CreateEvent(createMe *entities.Event, userID string) error
 	return db.Error
 }
 
+func (dh DataHandler) GetNumAttendingForEvent(eventID string) (int, error) {
+	// count the invitees attending
+	// -- SELECT * FROM invitees i LEFT JOIN guests g ON i.fk_guest_id = g.guest_id WHERE attending = true;
+
+	var iCount int
+
+	db := dh.conn.Debug().Table("invitees i").Joins("LEFT JOIN guests g ON i.fk_guest_id = g.guest_id").Where("fk_event_id = ? AND attending = true", eventID).Count(&iCount)
+
+	if db.Error != nil {
+		return 0, db.Error
+	}
+
+	// count the invitee friends attending
+	// -- SELECT * FROM invitees i LEFT JOIN invitee_friends ifs ON ifs.fk_invitee_id = i.invitee_id LEFT JOIN guests g ON ifs.fk_guest_id = g.guest_id WHERE attending = true;
+	var ifCount int
+
+	db = dh.conn.Debug().Table("invitees i").Joins("LEFT JOIN guests ig ON i.fk_guest_id = ig.guest_id LEFT JOIN invitee_friends ifs ON ifs.fk_invitee_id = i.invitee_id LEFT JOIN guests ifsg ON ifs.fk_guest_id = ifsg.guest_id").Where("fk_event_id = ? AND ig.attending = true AND ifsg.attending = true", eventID).Count(&ifCount)
+
+	return iCount + ifCount, db.Error
+}
+
 func (dh DataHandler) GetAllInviteesForEvent(eventId string, start int, length int) ([]entities.Invitee, error) {
 	var invitees = []entities.Invitee{}
 

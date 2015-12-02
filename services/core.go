@@ -45,6 +45,26 @@ func (c Coordinator) GetEventInfo(eventId string) (entities.Event, utils.Error) 
 	return c.events.GetEventInfo(eventId)
 }
 
+func (c Coordinator) GetEventStats(eventID string, userID string) (EventStats, utils.Error) {
+	// make sure the user is an admin for this event
+	isAdmin, err := c.events.IsUserAnAdminForEvent(userID, eventID)
+
+	if err != nil {
+		return EventStats{}, err
+	} else if !isAdmin {
+		return EventStats{}, utils.NewApiError(403, "You are not authorized to view the list of invitees for this event!")
+	}
+
+	stats := EventStats{}
+
+	stats.NumAttending, err = c.events.GetNumAttendingForEvent(eventID)
+	if err != nil {
+		return EventStats{}, utils.NewApiError(500, "Error getting stats!")
+	}
+
+	return stats, nil
+}
+
 func (c Coordinator) CreateEvent(event *entities.Event, userID string) utils.Error {
 	return c.events.CreateEvent(event, userID)
 }

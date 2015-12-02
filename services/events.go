@@ -21,10 +21,18 @@ type eventsGateway interface {
 	// GetEventAdminRecordForUserAndEventID gets the event admin record that
 	// contains both the user id UserID and the event id EventID.
 	GetEventAdminRecordForUserAndEventID(userID string, eventID string) (entities.EventAdmin, error)
+	// GetNumAttendingForEvent gets the number of guests that are attending for
+	// the specified event id
+	GetNumAttendingForEvent(eventID string) (int, error)
 }
 
 type eventsService struct {
 	da eventsGateway
+}
+
+type EventStats struct {
+	NumInvitees  int `json:"num_invitees"`
+	NumAttending int `json:"num_attending"`
 }
 
 func newEventsService(newDa eventsGateway) eventsService {
@@ -83,4 +91,14 @@ func (es eventsService) IsUserAnAdminForEvent(userID string, eventID string) (bo
 	}
 
 	return eAdmin.EventAdminID != "", nil
+}
+
+func (es eventsService) GetNumAttendingForEvent(eventID string) (int, utils.Error) {
+	num, err := es.da.GetNumAttendingForEvent(eventID)
+
+	if err != nil {
+		return 0, utils.NewApiError(500, err.Error())
+	}
+
+	return num, nil
 }

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/grounded042/capacious/entities"
+	"github.com/grounded042/capacious/services"
 	"github.com/grounded042/capacious/utils"
 	"github.com/zenazn/goji/web"
 )
@@ -14,6 +15,7 @@ import (
 type EventsStub interface {
 	GetEvents(string) ([]entities.Event, utils.Error)
 	GetEventInfo(eventId string) (entities.Event, utils.Error)
+	GetEventStats(eventID string, userID string) (services.EventStats, utils.Error)
 	CreateEvent(*entities.Event, string) utils.Error
 	GetMenuItemsForEvent(eventID string) ([]entities.MenuItem, utils.Error)
 	GetListOfSeatingRequestChoices(eventID string) ([]entities.SeatingRequestChoice, utils.Error)
@@ -55,6 +57,23 @@ func (ec EventsController) GetEventInfo(c web.C, w http.ResponseWriter, r *http.
 	} else {
 		w.WriteHeader(200)
 		json.NewEncoder(w).Encode(event)
+	}
+}
+
+// GetEventStats gets the stats for the specified event.
+func (ec EventsController) GetEventStats(c web.C, w http.ResponseWriter, r *http.Request) {
+	userID, ok := checkForAndHandleUserIDInContext(c, w, "You need a valid user id to get your list of events!")
+
+	if !ok {
+		return
+	}
+
+	if stats, err := ec.es.GetEventStats(c.URLParams["id"], userID); err != nil {
+		w.WriteHeader(utils.GetCodeForError(err))
+		fmt.Println(err)
+	} else {
+		w.WriteHeader(200)
+		json.NewEncoder(w).Encode(stats)
 	}
 }
 
