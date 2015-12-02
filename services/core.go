@@ -119,7 +119,7 @@ func (c Coordinator) encryptFkInviteeRequestID(toEncrypt string) (string, utils.
 
 // invitee coordination
 
-func (c Coordinator) GetInviteesForEvent(eventID string, userID string) ([]entities.Invitee, utils.Error) {
+func (c Coordinator) GetInviteesForEvent(eventID string, userID string, p *PaginationService) ([]entities.Invitee, utils.Error) {
 	// make sure the user is an admin for this event
 
 	isAdmin, err := c.events.IsUserAnAdminForEvent(userID, eventID)
@@ -130,7 +130,7 @@ func (c Coordinator) GetInviteesForEvent(eventID string, userID string) ([]entit
 		return []entities.Invitee{}, utils.NewApiError(403, "You are not authorized to view the list of invitees for this event!")
 	}
 
-	return c.invitees.GetInviteesForEvent(eventID)
+	return c.invitees.GetInviteesForEvent(eventID, p)
 }
 
 func (c Coordinator) CreateInviteeForEvent(invitee *entities.Invitee, event entities.Event) utils.Error {
